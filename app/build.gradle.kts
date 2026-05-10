@@ -53,6 +53,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.navigation.compose)
 
     // Room
     implementation(libs.androidx.room.runtime)
@@ -64,6 +66,14 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
+    // Retrofit & OkHttp
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp.logging)
+
+    // Coil
+    implementation(libs.coil.compose)
+
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
@@ -71,6 +81,10 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.analytics)
     implementation(libs.kotlinx.coroutines.play.services)
+
+    // Social Auth
+    implementation(libs.play.services.auth)
+    implementation(libs.facebook.login)
 
     implementation(libs.gson)
 
