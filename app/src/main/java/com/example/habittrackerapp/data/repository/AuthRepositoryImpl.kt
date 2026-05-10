@@ -45,11 +45,25 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun loginWithGoogle(idToken: String): Result<User> {
-        return Result.failure(NotImplementedError("Google login implementation required"))
+        return try {
+            val credential = com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, null)
+            val result = firebaseAuth.signInWithCredential(credential).await()
+            val user = result.user?.toDomainUser()
+            if (user != null) Result.success(user) else Result.failure(Exception("User is null"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun loginWithFacebook(token: String): Result<User> {
-        return Result.failure(NotImplementedError("Facebook login implementation required"))
+        return try {
+            val credential = com.google.firebase.auth.FacebookAuthProvider.getCredential(token)
+            val result = firebaseAuth.signInWithCredential(credential).await()
+            val user = result.user?.toDomainUser()
+            if (user != null) Result.success(user) else Result.failure(Exception("User is null"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun loginAnonymously(): Result<User> {
