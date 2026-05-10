@@ -1,3 +1,73 @@
 <resources>
-    <string name="app_name">HabitTrackerApp</string>
+    <string name="app_name">HabitTrack</string>
+    <string name="splash_tagline">Track your daily habits</string>
+    <string name="welcome_title">Welcome to Habit Tracker</string>
+    <string name="welcome_tagline">Track habits, build routines, and improve daily consistency.</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="continue_as_guest">Continue as Guest</string>
+    <string name="motto">YOUR HABITS SHAPE YOUR FUTURE.</string>
+
+    <string name="welcome_back">Welcome Back</string>
+    <string name="sign_in_subtitle">Sign in to continue your streak and track your progress today.</string>
+    <string name="email_address">EMAIL ADDRESS</string>
+    <string name="password">PASSWORD</string>
+    <string name="sign_in">Sign In</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
+    <string name="privacy_policy">Privacy Policy</string>
+
+    <string name="create_account">Create Account</string>
+    <string name="register_subtitle">Start building better daily habits</string>
+    <string name="username">Username</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="or">OR</string>
+    <string name="google">Google</string>
+    <string name="facebook">Facebook</string>
+    <string name="already_have_account">Already have an account?</string>
+
+    <string name="hello_user">Hello, %1$s!</string>
+    <string name="streak_msg">You\'re on a %1$d-day streak. Keep it up!</string>
+    <string name="daily_progress">Daily Progress</string>
+    <string name="completed_habits_msg">You\'ve completed %1$d out of %2$d habits today. Keep it up!</string>
+    <string name="today_habits">Today\'s Habits</string>
+    <string name="done_count">%1$d/%2$d Done</string>
+
+    <string name="habit_master_since">Habit Master since %1$d</string>
+    <string name="streak">STREAK</string>
+    <string name="days_count">%1$d Days</string>
+    <string name="completions">COMPLETIONS</string>
+    <string name="preferences">Preferences</string>
+    <string name="notifications_msg">Stay on track with habit reminders and system alerts.</string>
+    <string name="notifications">NOTIFICATIONS</string>
+    <string name="danger_zone">Danger Zone</string>
+    <string name="logout_msg">Log out of your account. All your data is safely synced to the cloud.</string>
+    <string name="logout">Logout</string>
+
+    <string name="general_info">General Info</string>
+    <string name="habit_name">HABIT NAME</string>
+    <string name="habit_name_hint">e.g., Drink Water</string>
+    <string name="habit_description">HABIT DESCRIPTION</string>
+    <string name="habit_description_hint">e.g., Drink at least 8 glasses of water</string>
+    <string name="frequency">Frequency</string>
+    <string name="frequency_msg">Repeat every week on selected days</string>
+    <string name="daily_goal">Daily Goal</string>
+    <string name="times_per_day">TIMES PER DAY</string>
+    <string name="reminders">Reminders</string>
+    <string name="reminders_msg">Set a notification to keep you on track with your habit.</string>
+    <string name="create_habit">Create Habit</string>
+    <string name="edit_habit">Edit Habit</string>
+
+    <string name="home">Home</string>
+    <string name="add">Add</string>
+    <string name="profile">Profile</string>
+    <string name="statistics">Statistics</string>
+    <string name="settings">Settings</string>
+
+    <string name="mon">M</string>
+    <string name="tue">T</string>
+    <string name="wed">W</string>
+    <string name="thu">T</string>
+    <string name="fri">F</string>
+    <string name="sat">S</string>
+    <string name="sun">S</string>
 </resources>
