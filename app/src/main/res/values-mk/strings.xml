@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">HabitTrack</string>
+    <string name="splash_tagline">Следете ги вашите секојдневни навики</string>
+    <string name="welcome_title">Добредојдовте во Habit Tracker</string>
+    <string name="welcome_tagline">Следете ги навиките, изградете рутини и подобрете ја секојдневната конзистентност.</string>
+    <string name="login">Најава</string>
+    <string name="register">Регистрација</string>
+    <string name="continue_as_guest">Продолжи како гостин</string>
+    <string name="motto">ВАШИТЕ НАВИКИ ЈА ОБЛИКУВААТ ВАШАТА ИДНИНА.</string>
+
+    <string name="welcome_back">Добредојдовте назад</string>
+    <string name="sign_in_subtitle">Најавете се за да продолжите со вашата серија и да го следите вашиот напредок денес.</string>
+    <string name="email_address">Е-ПОШТА</string>
+    <string name="password">ЛОЗИНКА</string>
+    <string name="sign_in">Најави се</string>
+    <string name="dont_have_account">Немате сметка?</string>
+    <string name="privacy_policy">Политика за приватност</string>
+
+    <string name="create_account">Креирај сметка</string>
+    <string name="register_subtitle">Започнете со градење подобри секојдневни навики</string>
+    <string name="username">Корисничко име</string>
+    <string name="confirm_password">Потврди лозинка</string>
+    <string name="or">ИЛИ</string>
+    <string name="google">Google</string>
+    <string name="facebook">Facebook</string>
+    <string name="already_have_account">Веќе имате сметка?</string>
+
+    <string name="hello_user">Здраво, %1$s!</string>
+    <string name="streak_msg">Вие сте во серија од %1$d дена. Продолжете така!</string>
+    <string name="daily_progress">Дневен напредок</string>
+    <string name="completed_habits_msg">Денес завршивте %1$d од %2$d навики. Продолжете така!</string>
+    <string name="today_habits">Денешни навики</string>
+    <string name="done_count">%1$d/%2$d Завршено</string>
+
+    <string name="habit_master_since">Habit Master од %1$d</string>
+    <string name="streak">СЕРИЈА</string>
+    <string name="days_count">%1$d дена</string>
+    <string name="completions">ЗАВРШУВАЊА</string>
+    <string name="preferences">Преференции</string>
+    <string name="notifications_msg">Останете во тек со потсетници за навики и системски предупредувања.</string>
+    <string name="notifications">ИЗВЕСТУВАЊА</string>
+    <string name="danger_zone">Опасна зона</string>
+    <string name="logout_msg">Одјавете се од вашата сметка. Сите ваши податоци се безбедно синхронизирани во облакот.</string>
+    <string name="logout">Одјава</string>
+
+    <string name="general_info">Општи информации</string>
+    <string name="habit_name">ИМЕ НА НАВИКАТА</string>
+    <string name="habit_name_hint">пр., Пиење вода</string>
+    <string name="habit_description">ОПИС НА НАВИКАТА</string>
+    <string name="habit_description_hint">пр., Пијте најмалку 8 чаши вода</string>
+    <string name="frequency">Фреквенција</string>
+    <string name="frequency_msg">Повторувајте секоја недела на избраните денови</string>
+    <string name="daily_goal">Дневна цел</string>
+    <string name="times_per_day">ПАТИ ДНЕВНО</string>
+    <string name="reminders">Потсетници</string>
+    <string name="reminders_msg">Поставете известување за да бидете во тек со вашата навика.</string>
+    <string name="create_habit">Креирај навика</string>
+    <string name="edit_habit">Уреди навика</string>
+
+    <string name="home">Дома</string>
+    <string name="add">Додај</string>
+    <string name="profile">Профил</string>
+    <string name="statistics">Статистика</string>
+    <string name="settings">Поставки</string>
+    <string name="october_2023">Октомври 2023</string>
+
+    <string name="mon">П</string>
+    <string name="tue">В</string>
+    <string name="wed">С</string>
+    <string name="thu">Ч</string>
+    <string name="fri">П</string>
+    <string name="sat">С</string>
+    <string name="sun">Н</string>
+
+    <string name="completion_rate">Стапка на завршување</string>
+    <string name="longest_streak">Најдолга серија</string>
+    <string name="total_done">Вкупно завршени</string>
+    <string name="weekly_progress">Неделен напредок</string>
+    <string name="consistency_map">Мапа на конзистентност</string>
+
+</resources>

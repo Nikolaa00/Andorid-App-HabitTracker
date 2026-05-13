@@ -35,7 +35,8 @@ local.properties
 # Build output
 /build
 /captures
-
+.gradle/
+build/
 # Firebase / Google services (ако користиш)
 google-services.json
 
