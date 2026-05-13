@@ -4,17 +4,16 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.services)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
     namespace = "com.example.habittrackerapp"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.habittrackerapp"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -65,6 +64,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation("androidx.hilt:hilt-work:1.3.0")
+    ksp("androidx.hilt:hilt-compiler:1.3.0")
 
     // Retrofit & OkHttp
     implementation(libs.retrofit)
@@ -87,6 +88,7 @@ dependencies {
     implementation(libs.facebook.login)
 
     implementation(libs.gson)
+    implementation("androidx.work:work-runtime-ktx:2.11.2")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

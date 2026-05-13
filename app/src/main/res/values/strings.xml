@@ -18,8 +18,8 @@
 
     <string name="create_account">Create Account</string>
     <string name="register_subtitle">Start building better daily habits</string>
-    <string name="username">Username</string>
-    <string name="confirm_password">Confirm Password</string>
+    <string name="username">USERNAME</string>
+    <string name="confirm_password">CONFIRM PASSWORD</string>
     <string name="or">OR</string>
     <string name="google">Google</string>
     <string name="facebook">Facebook</string>
@@ -62,6 +62,7 @@
     <string name="profile">Profile</string>
     <string name="statistics">Statistics</string>
     <string name="settings">Settings</string>
+    <string name="october_2023">October 2023</string>
 
     <string name="mon">M</string>
     <string name="tue">T</string>
@@ -70,4 +71,15 @@
     <string name="fri">F</string>
     <string name="sat">S</string>
     <string name="sun">S</string>
+
+    <string name="completion_rate">Completion Rate</string>
+    <string name="longest_streak">Longest Streak</string>
+    <string name="total_done">Total Done</string>
+    <string name="weekly_progress">Weekly Progress</string>
+    <string name="consistency_map">Consistency Map</string>
+
+    <string name="facebook_app_id">960668496887576</string>
+    <string name="fb_login_protocol_scheme">fb960668496887576</string>
+    <string name="facebook_client_token">a1f75f51e39ffe9b6625f1edd8deaf61</string>
+    <string name="default_web_client_id">744297408708-tf57bm2kkkrh47s23qr3u3evd7oramnh.apps.googleusercontent.com</string>
 </resources>
