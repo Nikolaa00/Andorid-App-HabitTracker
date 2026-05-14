@@ -3,7 +3,6 @@ package com.example.habittrackerapp.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
@@ -50,7 +49,7 @@ fun ProfileSettingsScreen(navController: NavController) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = stringResource(R.string.profile_since),
+                    text = stringResource(R.string.profile_subtitle),
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
@@ -59,14 +58,16 @@ fun ProfileSettingsScreen(navController: NavController) {
                 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     StatCard(
-                        label = stringResource(R.string.streak_label),
-                        value = stringResource(R.string.streak_days),
-                        modifier = Modifier.weight(1f)
+                        label = stringResource(R.string.label_streak),
+                        value = stringResource(R.string.value_streak_days),
+                        modifier = Modifier.weight(1f),
+                        accentColor = Color(0xFF2E7D32)
                     )
                     StatCard(
-                        label = stringResource(R.string.completion_label),
+                        label = stringResource(R.string.label_completed),
                         value = stringResource(R.string.completion_value),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        accentColor = Color(0xFF1A73E8)
                     )
                 }
             }
@@ -85,10 +86,10 @@ fun ProfileSettingsScreen(navController: NavController) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Notifications, contentDescription = null, tint = Color(0xFF1A73E8))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.preferences), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.header_preferences), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = stringResource(R.string.preferences_description), fontSize = 14.sp, color = Color.Gray)
+                Text(text = stringResource(R.string.desc_preferences), fontSize = 14.sp, color = Color.Gray)
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Row(
@@ -96,7 +97,7 @@ fun ProfileSettingsScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = stringResource(R.string.notifications), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.Gray)
+                    Text(text = stringResource(R.string.label_notifications), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.Gray)
                     Switch(
                         checked = notificationsEnabled,
                         onCheckedChange = { notificationsEnabled = it },
@@ -119,10 +120,10 @@ fun ProfileSettingsScreen(navController: NavController) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFD32F2F))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.danger_zone), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.header_danger_zone), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = stringResource(R.string.danger_zone_description), fontSize = 14.sp, color = Color.Gray)
+                Text(text = stringResource(R.string.desc_danger_zone), fontSize = 14.sp, color = Color.Gray)
                 Spacer(modifier = Modifier.height(24.dp))
                 
                 OutlinedButton(
@@ -133,7 +134,7 @@ fun ProfileSettingsScreen(navController: NavController) {
                     shape = RoundedCornerShape(28.dp),
                     border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp)
                 ) {
-                    Text(text = stringResource(R.string.logout), color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.btn_logout), color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -141,7 +142,7 @@ fun ProfileSettingsScreen(navController: NavController) {
 }
 
 @Composable
-fun StatCard(label: String, value: String, modifier: Modifier) {
+fun StatCard(label: String, value: String, modifier: Modifier, accentColor: Color) {
     Surface(
         modifier = modifier.border(1.dp, LightGrayBorder, RoundedCornerShape(32.dp)),
         shape = RoundedCornerShape(32.dp),
@@ -152,7 +153,7 @@ fun StatCard(label: String, value: String, modifier: Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = label, fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-            Text(text = value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = if (label == "STREAK") Color(0xFF2E7D32) else Color(0xFF1A73E8))
+            Text(text = value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = accentColor)
         }
     }
 }

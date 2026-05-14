@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -40,13 +39,13 @@ fun DashboardScreen() {
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 Text(
-                    text = stringResource(R.string.hello_user),
+                    text = stringResource(R.string.greeting_user),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1E293B)
                 )
                 Text(
-                    text = stringResource(R.string.streak_message),
+                    text = stringResource(R.string.streak_info),
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
@@ -70,7 +69,7 @@ fun DashboardScreen() {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.daily_progress_message),
+                    text = stringResource(R.string.progress_subtext),
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
@@ -104,7 +103,7 @@ fun DashboardScreen() {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.habits_done_count),
+                    text = stringResource(R.string.done_badge),
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
@@ -118,22 +117,22 @@ fun DashboardScreen() {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(1.dp)) {
             item {
                 HabitItem(
-                    title = stringResource(R.string.hydration_goal),
-                    subtitle = stringResource(R.string.hydration_value),
+                    title = stringResource(R.string.habit_hydration),
+                    subtitle = "2.5L / 3L",
                     isCompleted = false
                 )
             }
             item {
                 HabitItem(
-                    title = stringResource(R.string.mindfulness),
-                    subtitle = stringResource(R.string.mindfulness_session),
+                    title = stringResource(R.string.habit_mindfulness),
+                    subtitle = "15 min Session",
                     isCompleted = true
                 )
             }
             item {
                 HabitItem(
-                    title = stringResource(R.string.evening_walk),
-                    subtitle = stringResource(R.string.evening_walk_time),
+                    title = stringResource(R.string.habit_walk),
+                    subtitle = "30 min at 6 PM",
                     isCompleted = false
                 )
             }

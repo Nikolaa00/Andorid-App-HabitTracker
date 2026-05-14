@@ -48,15 +48,15 @@ fun CreateHabitScreen(navController: NavController) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.EditNote, contentDescription = null, tint = EmeraldGreen)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.general_info), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.header_general), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                Text(text = stringResource(R.string.habit_name_label), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.label_habit_name), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
                 OutlinedTextField(
                     value = habitName,
                     onValueChange = { habitName = it },
-                    placeholder = { Text(stringResource(R.string.habit_name_hint)) },
+                    placeholder = { Text(stringResource(R.string.hint_habit_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = LightGrayBorder)
@@ -64,11 +64,11 @@ fun CreateHabitScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(text = stringResource(R.string.habit_description_label), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.label_habit_desc), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
                 OutlinedTextField(
                     value = habitDescription,
                     onValueChange = { habitDescription = it },
-                    placeholder = { Text(stringResource(R.string.habit_description_hint)) },
+                    placeholder = { Text(stringResource(R.string.hint_habit_desc)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = LightGrayBorder)
@@ -87,7 +87,7 @@ fun CreateHabitScreen(navController: NavController) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.CalendarToday, contentDescription = null, tint = EmeraldGreen)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.frequency), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.header_frequency), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 
@@ -108,7 +108,7 @@ fun CreateHabitScreen(navController: NavController) {
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = stringResource(R.string.repeat_weekly), fontSize = 14.sp, color = Color.Gray)
+                Text(text = stringResource(R.string.frequency_subtext), fontSize = 14.sp, color = Color.Gray)
             }
         }
 
@@ -123,7 +123,7 @@ fun CreateHabitScreen(navController: NavController) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.TrackChanges, contentDescription = null, tint = EmeraldGreen)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.daily_goal_label), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.header_goal), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 
@@ -137,7 +137,7 @@ fun CreateHabitScreen(navController: NavController) {
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = dailyGoal.toString(), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                        Text(text = stringResource(R.string.times_per_day), fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                        Text(text = stringResource(R.string.counter_times_per_day), fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
                     }
                     IconButton(onClick = { dailyGoal++ }, modifier = Modifier.background(Color.White, CircleShape)) {
                         Icon(Icons.Default.Add, contentDescription = null)
@@ -157,7 +157,7 @@ fun CreateHabitScreen(navController: NavController) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.NotificationsActive, contentDescription = null, tint = EmeraldGreen)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.reminders), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.header_reminders), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = stringResource(R.string.reminders_description), fontSize = 14.sp, color = Color.Gray)
@@ -185,7 +185,7 @@ fun CreateHabitScreen(navController: NavController) {
         ) {
             Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = stringResource(R.string.create_habit_button), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.btn_create_habit), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
