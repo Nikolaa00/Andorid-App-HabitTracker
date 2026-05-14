@@ -7,11 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.habittrackerapp"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.habittrackerapp"
@@ -19,7 +15,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -32,16 +27,37 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
+    // Force dependency resolution rules to eliminate all Snyk io.netty vulnerabilities
+    constraints {
+        implementation("io.netty:netty-codec:4.1.133.Final") {
+            because("Fixes vulnerability issues flagged in older internal build systems")
+        }
+        implementation("io.netty:netty-codec-http:4.1.133.Final") {
+            because("Fixes vulnerability issues flagged in older internal build systems")
+        }
+        implementation("io.netty:netty-codec-http2:4.1.133.Final") {
+            because("Fixes vulnerability issues flagged in older internal build systems")
+        }
+        implementation("io.netty:netty-handler:4.1.133.Final") {
+            because("Fixes vulnerability issues flagged in older internal build systems")
+        }
+        implementation("io.netty:netty-common:4.1.133.Final") {
+            because("Fixes vulnerability issues flagged in older internal build systems")
+        }
+    }
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -50,7 +66,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    
+
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
