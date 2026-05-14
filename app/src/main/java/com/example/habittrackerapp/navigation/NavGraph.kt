@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.habittrackerapp.ui.screens.*
 
 @Composable
 fun SetupNavGraph(
@@ -14,25 +15,25 @@ fun SetupNavGraph(
         startDestination = Screen.Splash.route
     ) {
         composable(route = Screen.Splash.route) {
-            // Splash Screen placeholder
+            SplashScreen(navController = navController)
         }
-        composable(route = Screen.Gateway.route) {
-            // Gateway Screen placeholder
+        composable(route = Screen.Welcome.route) {
+            WelcomeScreen(navController = navController)
         }
         composable(route = Screen.Login.route) {
-            // Login Screen placeholder
+            SignInScreen(navController = navController)
         }
         composable(route = Screen.Register.route) {
-            // Register Screen placeholder
+            RegisterScreen(navController = navController)
         }
         composable(route = Screen.Home.route) {
-            // Home Screen placeholder
+            DashboardScreen()
         }
         composable(route = Screen.Profile.route) {
-            // Profile Screen placeholder
+            ProfileSettingsScreen(navController = navController)
         }
         composable(route = Screen.CreateHabit.route) {
-            // Create Habit Screen placeholder
+            CreateHabitScreen(navController = navController)
         }
     }
 }
