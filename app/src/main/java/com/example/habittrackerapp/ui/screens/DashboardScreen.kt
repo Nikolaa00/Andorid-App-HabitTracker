@@ -75,7 +75,7 @@ fun DashboardScreen() {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 LinearProgressIndicator(
-                    progress = 4f / 6f,
+                    progress = { 4f / 6f },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(12.dp)

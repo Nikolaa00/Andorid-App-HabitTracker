@@ -27,7 +27,6 @@ import com.example.habittrackerapp.R
 import com.example.habittrackerapp.navigation.Screen
 import com.example.habittrackerapp.navigation.SetupNavGraph
 import com.example.habittrackerapp.ui.components.LanguageSwitcherBar
-import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.util.LocaleHelper
 import java.util.Locale
 
@@ -46,7 +45,7 @@ fun MainNavigationShell(
     // Local Composition Context Layer to force resource update
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
-    val locale = Locale(currentLanguage.value)
+    val locale = Locale.forLanguageTag(currentLanguage.value)
     
     // Update locale on the configuration
     val updatedConfiguration = Configuration(configuration).apply {
@@ -82,7 +81,7 @@ fun MainNavigationShell(
                                 }
                             )
                         },
-                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
                     )
                 }
             },
@@ -112,8 +111,8 @@ fun MainNavigationShell(
                                 },
                                 colors = NavigationBarItemDefaults.colors(
                                     selectedIconColor = Color.Black,
-                                    selectedTextColor = EmeraldGreen,
-                                    indicatorColor = EmeraldGreen,
+                                    selectedTextColor = com.example.habittrackerapp.ui.theme.EmeraldGreen,
+                                    indicatorColor = com.example.habittrackerapp.ui.theme.EmeraldGreen,
                                     unselectedIconColor = Color.Gray,
                                     unselectedTextColor = Color.Gray
                                 )
@@ -131,7 +130,7 @@ fun MainNavigationShell(
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = null,
-                                tint = EmeraldGreen,
+                                tint = com.example.habittrackerapp.ui.theme.EmeraldGreen,
                                 modifier = Modifier.size(48.dp).padding(vertical = 16.dp)
                             )
                         }
@@ -159,8 +158,8 @@ fun MainNavigationShell(
                                 },
                                 colors = NavigationRailItemDefaults.colors(
                                     selectedIconColor = Color.Black,
-                                    selectedTextColor = EmeraldGreen,
-                                    indicatorColor = EmeraldGreen,
+                                    selectedTextColor = com.example.habittrackerapp.ui.theme.EmeraldGreen,
+                                    indicatorColor = com.example.habittrackerapp.ui.theme.EmeraldGreen,
                                     unselectedIconColor = Color.Gray,
                                     unselectedTextColor = Color.Gray
                                 )

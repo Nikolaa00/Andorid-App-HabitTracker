@@ -132,7 +132,7 @@ fun ProfileSettingsScreen(navController: NavController) {
                     } },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(28.dp),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp)
+                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)
                 ) {
                     Text(text = stringResource(R.string.btn_logout), color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold)
                 }
