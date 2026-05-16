@@ -63,18 +63,18 @@ fun SignInScreen(navController: NavController) {
                         modifier = Modifier.size(32.dp)
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 Text(
                     text = stringResource(R.string.welcome_back),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1A237E)
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = stringResource(R.string.sign_in_to_continue),
                     fontSize = 14.sp,
@@ -170,27 +170,33 @@ fun SignInScreen(navController: NavController) {
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
-            TextButton(
-                onClick = { navController.navigate(Screen.Register.route) },
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = stringResource(R.string.dont_have_account_register),
-                    color = Color(0xFF2E7D32),
-                    fontWeight = FontWeight.Medium
+                    fontSize = 14.sp,
+                    color = Color.Gray
                 )
+
+                TextButton(
+                    onClick = { navController.navigate(Screen.Register.route) }
+                ) {
+                    Text(
+                        text = stringResource(R.string.register),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1976D2)
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = stringResource(R.string.copyright_notice),
-            fontSize = 12.sp,
-            color = Color.Gray,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
     }
 }

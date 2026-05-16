@@ -13,14 +13,14 @@
     <string name="email_hint">ime@primer.com</string>
     <string name="password_label">ЛОЗИНКА</string>
     <string name="sign_in_arrow">Најави се -></string>
-    <string name="dont_have_account_register">Немате сметка? Регистрирајте се</string>
+    <string name="dont_have_account_register">Немате сметка?</string>
     <string name="copyright_notice">© 2024 HabitFlow Inc. • Политика за приватност</string>
     <string name="create_account">Креирај сметка</string>
     <string name="start_building_better_habits">Започнете со градење подобри дневни навики</string>
     <string name="username_label">Корисничко име</string>
-    <string name="username_hint">korisnik</string>
+    <string name="username_hint">Име</string>
     <string name="email_address_full">Е-пошта</string>
-    <string name="email_address_hint">korisnik@primer.com</string>
+    <string name="email_address_hint">ime@primer.com</string>
     <string name="confirm_password_label">Потврди лозинка</string>
     <string name="or_divider">ИЛИ</string>
     <string name="google">Google</string>

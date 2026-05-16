@@ -1,7 +1,7 @@
 package com.example.habittrackerapp.ui.screens
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -58,21 +58,23 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Header Section
             item {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)), // Ист раб со заоблување од 24.dp
                     shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(80.dp)
+                                .size(64.dp) // Намалено од 80.dp на 64.dp (како во SignIn)
                                 .background(Color(0xFFE8F5E9), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
@@ -80,16 +82,21 @@ fun RegisterScreen(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = null,
                                 tint = EmeraldGreen,
-                                modifier = Modifier.size(40.dp)
+                                modifier = Modifier.size(32.dp) // Намалено од 40.dp на 32.dp (како во SignIn)
                             )
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Spacer(modifier = Modifier.height(24.dp)) // Зголемено од 16.dp на 24.dp за исто растојание
+
                         Text(
                             text = stringResource(R.string.create_account),
-                            fontSize = 28.sp,
+                            fontSize = 24.sp, // Намалено од 28.sp на 24.sp за иста големина
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = Color(0xFF1A237E) // Променето од Color.Black во темно сината боја од SignInScreen
                         )
+
+                        Spacer(modifier = Modifier.height(8.dp)) // Додадено мало растојание пред поднасловот
+
                         Text(
                             text = stringResource(R.string.start_building_better_habits),
                             fontSize = 14.sp,
@@ -114,7 +121,6 @@ fun RegisterScreen(
                             value = username,
                             onValueChange = viewModel::onUsernameChange,
                             placeholder = stringResource(R.string.username_hint),
-                            icon = Icons.Default.Person
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         RegisterInputField(
@@ -122,7 +128,6 @@ fun RegisterScreen(
                             value = email,
                             onValueChange = viewModel::onEmailChange,
                             placeholder = stringResource(R.string.email_address_hint),
-                            icon = Icons.Default.Email
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         RegisterInputField(
@@ -130,7 +135,6 @@ fun RegisterScreen(
                             value = password,
                             onValueChange = viewModel::onPasswordChange,
                             placeholder = "••••••••",
-                            icon = Icons.Default.Lock,
                             isPassword = true
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -139,7 +143,6 @@ fun RegisterScreen(
                             value = confirmPassword,
                             onValueChange = viewModel::onConfirmPasswordChange,
                             placeholder = "••••••••",
-                            icon = Icons.Default.Lock,
                             isPassword = true
                         )
 
@@ -207,8 +210,8 @@ fun RegisterScreen(
                             SocialAuthButton(
                                 text = stringResource(R.string.facebook),
                                 icon = Icons.Default.Facebook,
-                                containerColor = Color(0xFF1877F2),
-                                contentColor = Color.White,
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
                                 modifier = Modifier.weight(1f),
                                 onClick = { viewModel.registerWithFacebook { navController.navigate(Screen.Home.route) } }
                             )
@@ -238,10 +241,11 @@ fun RegisterScreen(
             // Footer Section
             item {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(0.dp,0.dp,0.dp,5.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+
                 ) {
                     Row(
                         modifier = Modifier
@@ -266,6 +270,7 @@ fun RegisterScreen(
                     }
                 }
             }
+
         }
     }
 }
@@ -276,7 +281,6 @@ fun RegisterInputField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    icon: ImageVector,
     isPassword: Boolean = false
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -292,7 +296,6 @@ fun RegisterInputField(
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(placeholder, color = Color.LightGray) },
-            leadingIcon = { Icon(icon, contentDescription = null, tint = EmeraldGreen, modifier = Modifier.size(20.dp)) },
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
             visualTransformation = if (isPassword) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,

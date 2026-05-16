@@ -13,14 +13,14 @@
     <string name="email_hint">name@example.com</string>
     <string name="password_label">PASSWORD</string>
     <string name="sign_in_arrow">Sign In -></string>
-    <string name="dont_have_account_register">Don\'t have an account? Register</string>
+    <string name="dont_have_account_register">Don\'t have an account?</string>
     <string name="copyright_notice">© 2024 HabitFlow Inc. • Privacy Policy</string>
     <string name="create_account">Create Account</string>
     <string name="start_building_better_habits">Start building better daily habits</string>
     <string name="username_label">Username</string>
-    <string name="username_hint">johndoe</string>
+    <string name="username_hint">Name</string>
     <string name="email_address_full">Email Address</string>
-    <string name="email_address_hint">john@example.com</string>
+    <string name="email_address_hint">name@example.com</string>
     <string name="confirm_password_label">Confirm Password</string>
     <string name="or_divider">OR</string>
     <string name="google">Google</string>
