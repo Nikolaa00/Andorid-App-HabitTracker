@@ -1,14 +1,18 @@
 package com.example.habittrackerapp.navigation
 
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.habittrackerapp.ui.screens.*
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.habittrackerapp.viewmodel.RegisterViewModel
 
 @Composable
 fun SetupNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    windowSizeClass: WindowSizeClass
 ) {
     NavHost(
         navController = navController,
@@ -24,7 +28,12 @@ fun SetupNavGraph(
             SignInScreen(navController = navController)
         }
         composable(route = Screen.Register.route) {
-            RegisterScreen(navController = navController)
+            val viewModel: RegisterViewModel = hiltViewModel() // ✅ safe here
+            RegisterScreen(
+                navController = navController,
+                windowSizeClass = windowSizeClass,
+                viewModel = viewModel
+            )
         }
         composable(route = Screen.Home.route) {
             DashboardScreen()

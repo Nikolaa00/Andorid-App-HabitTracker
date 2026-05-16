@@ -5,6 +5,18 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+// ✅ Ова гарантира дека Gradle ќе ги отфрли сите стари верзии на Netty повлечени од core-ktx
+configurations.all {
+    resolutionStrategy {
+        force("io.netty:netty-codec:4.1.133.Final")
+        force("io.netty:netty-codec-http:4.1.133.Final")
+        force("io.netty:netty-codec-http2:4.1.133.Final")
+        force("io.netty:netty-handler:4.1.133.Final")
+        force("io.netty:netty-common:4.1.133.Final")
+    }
+}
+
+@Suppress("AndroidLintCompileSdk")
 android {
     namespace = "com.example.habittrackerapp"
     compileSdk = 36
@@ -15,6 +27,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -29,8 +42,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -38,50 +51,42 @@ android {
     }
 }
 
-dependencies {
-    // Force dependency resolution rules to eliminate all Snyk io.netty vulnerabilities
-    constraints {
-        implementation("io.netty:netty-codec:4.1.133.Final") {
-            because("Fixes vulnerability issues flagged in older internal build systems")
-        }
-        implementation("io.netty:netty-codec-http:4.1.133.Final") {
-            because("Fixes vulnerability issues flagged in older internal build systems")
-        }
-        implementation("io.netty:netty-codec-http2:4.1.133.Final") {
-            because("Fixes vulnerability issues flagged in older internal build systems")
-        }
-        implementation("io.netty:netty-handler:4.1.133.Final") {
-            because("Fixes vulnerability issues flagged in older internal build systems")
-        }
-        implementation("io.netty:netty-common:4.1.133.Final") {
-            because("Fixes vulnerability issues flagged in older internal build systems")
-        }
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
+}
 
+dependencies {
+    // Jetpack Compose BOM
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
+
+    // Core Android библиотеки
+    implementation(libs.androidx.core.ktx) // Старите внатрешни зависности на оваа линија сега се форсирано поправени погоре!
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.compose.material3.windowSizeClass)
     implementation(libs.androidx.compose.material.icons.extended)
 
-    // Room
+    // Room локална база
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Hilt
+    // Hilt Dependency Injection
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
 
-    // Navigation
+    // Navigation Compose
     implementation(libs.androidx.navigation.compose)
 
+    // Тестирање
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
