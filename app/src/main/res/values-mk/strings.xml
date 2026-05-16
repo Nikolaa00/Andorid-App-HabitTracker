@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">Следач на навики</string>
+    <string name="track_daily_habits">Следете ги вашите дневни навики</string>
+    <string name="welcome_to_habit_tracker">Добредојдовте во Следач на навики</string>
+    <string name="welcome_description">Следете навики, градете рутини и подобрете ја дневната конзистентност.</string>
+    <string name="login">Најава</string>
+    <string name="register">Регистрација</string>
+    <string name="continue_as_guest">Продолжи како гостин</string>
+    <string name="habits_shape_future">ВАШИТЕ НАВИКИ ЈА ОБЛИКУВААТ ВАШАТА ИДНИНА.</string>
+    <string name="welcome_back">Добредојдовте назад</string>
+    <string name="sign_in_to_continue">Најавете се за да ја продолжите вашата серија и да го следите вашиот напредок денес.</string>
+    <string name="email_address_label">Е-ПОШТА</string>
+    <string name="email_hint">ime@primer.com</string>
+    <string name="password_label">ЛОЗИНКА</string>
+    <string name="sign_in_arrow">Најави се -></string>
+    <string name="dont_have_account_register">Немате сметка?</string>
+    <string name="copyright_notice">© 2024 HabitFlow Inc. • Политика за приватност</string>
+    <string name="create_account">Креирај сметка</string>
+    <string name="start_building_better_habits">Започнете со градење подобри дневни навики</string>
+    <string name="username_label">Корисничко име</string>
+    <string name="username_hint">Име</string>
+    <string name="email_address_full">Е-пошта</string>
+    <string name="email_address_hint">ime@primer.com</string>
+    <string name="confirm_password_label">Потврди лозинка</string>
+    <string name="or_divider">ИЛИ</string>
+    <string name="google">Google</string>
+    <string name="facebook">Facebook</string>
+    <string name="already_have_account">Веќе имате сметка? </string>
+
+    <string name="greeting_user">Здраво, Кориснику!</string>
+    <string name="streak_info">Имаш 12-дневен серијал. Продолжи така!</string>
+    <string name="daily_progress">Дневен Напредок</string>
+    <string name="progress_subtext">Денес заврши 4 од 6 навики. Продолжи така!</string>
+    <string name="todays_habits">Денешни Навики</string>
+    <string name="done_badge">4/6 Завршено</string>
+    <string name="habit_hydration">Цел за хидратација</string>
+    <string name="habit_mindfulness">Свесност</string>
+    <string name="habit_walk">Вечерна прошетка</string>
+
+    <string name="profile_name">Јован Јованов</string>
+    <string name="profile_subtitle">Мастер за навики од 2023</string>
+    <string name="label_streak">СЕРИЈА</string>
+    <string name="value_streak_days">12 Дена</string>
+    <string name="label_completed">ЗАВРШЕНО</string>
+    <string name="completion_value">482</string>
+    <string name="header_preferences">Преференции</string>
+    <string name="desc_preferences">Останете на пат со потсетници за навики и системски известувања.</string>
+    <string name="label_notifications">ИЗВЕСТУВАЊА</string>
+    <string name="header_danger_zone">Опасна зона</string>
+    <string name="desc_danger_zone">Одјавете се од вашата сметка. Сите ваши податоци се безбедно синхронизирани на облакот.</string>
+    <string name="btn_logout">Одјава</string>
+
+    <string name="home_nav">Почетна</string>
+    <string name="add_nav">Додај</string>
+    <string name="profile_nav">Профил</string>
+
+    <string name="header_general">Општи информации</string>
+    <string name="label_habit_name">ИМЕ НА НАВИКА</string>
+    <string name="hint_habit_name">пр. Пиј вода</string>
+    <string name="label_habit_desc">ОПИС НА НАВИКА</string>
+    <string name="hint_habit_desc">пр. Пиј најмалку 8 чаши вода</string>
+    <string name="header_frequency">Фреквенција</string>
+    <string name="day_m">П</string>
+    <string name="day_t">В</string>
+    <string name="day_w">С</string>
+    <string name="day_th">Ч</string>
+    <string name="day_f">П</string>
+    <string name="day_s">С</string>
+    <string name="day_su">Н</string>
+    <string name="frequency_subtext">Повторувај секоја недела на избраните денови</string>
+    <string name="header_goal">Дневна цел</string>
+    <string name="counter_times_per_day">ПАТИ НА ДЕН</string>
+    <string name="header_reminders">Потсетници</string>
+    <string name="reminders_description">Поставете известување за да останете во тек со вашата навика.</string>
+    <string name="reminder_time_default">08:00 наутро</string>
+    <string name="btn_create_habit">Креирај навика</string>
+</resources>
