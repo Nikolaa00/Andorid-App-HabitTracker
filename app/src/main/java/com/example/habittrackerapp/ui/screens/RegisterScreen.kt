@@ -15,7 +15,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -62,7 +63,7 @@ fun RegisterScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)), // Ист раб со заоблување од 24.dp
+                        .border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
@@ -74,7 +75,7 @@ fun RegisterScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(64.dp) // Намалено од 80.dp на 64.dp (како во SignIn)
+                                .size(64.dp)
                                 .background(Color(0xFFE8F5E9), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
@@ -82,20 +83,20 @@ fun RegisterScreen(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = null,
                                 tint = EmeraldGreen,
-                                modifier = Modifier.size(32.dp) // Намалено од 40.dp на 32.dp (како во SignIn)
+                                modifier = Modifier.size(32.dp)
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp)) // Зголемено од 16.dp на 24.dp за исто растојание
+                        Spacer(modifier = Modifier.height(24.dp))
 
                         Text(
                             text = stringResource(R.string.create_account),
-                            fontSize = 24.sp, // Намалено од 28.sp на 24.sp за иста големина
+                            fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1A237E) // Променето од Color.Black во темно сината боја од SignInScreen
+                            color = Color(0xFF1A237E)
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp)) // Додадено мало растојание пред поднасловот
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
                             text = stringResource(R.string.start_building_better_habits),
@@ -201,7 +202,7 @@ fun RegisterScreen(
                         ) {
                             SocialAuthButton(
                                 text = stringResource(R.string.google),
-                                icon = Icons.Default.AccountCircle, // Placeholder for Google
+                                icon = painterResource(id = R.drawable.ic_google),
                                 containerColor = Color.White,
                                 contentColor = Color.Black,
                                 modifier = Modifier.weight(1f),
@@ -209,7 +210,7 @@ fun RegisterScreen(
                             )
                             SocialAuthButton(
                                 text = stringResource(R.string.facebook),
-                                icon = Icons.Default.Facebook,
+                                icon = painterResource(id = R.drawable.ic_facebook),
                                 containerColor = Color.White,
                                 contentColor = Color.Black,
                                 modifier = Modifier.weight(1f),
@@ -312,7 +313,7 @@ fun RegisterInputField(
 @Composable
 fun SocialAuthButton(
     text: String,
-    icon: ImageVector,
+    icon: Painter,
     containerColor: Color,
     contentColor: Color,
     modifier: Modifier = Modifier,
@@ -326,7 +327,12 @@ fun SocialAuthButton(
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
         border = if (containerColor == Color.White) androidx.compose.foundation.BorderStroke(1.dp, LightGrayBorder) else null
     ) {
-        Icon(icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(20.dp))
+        Icon(
+            painter = icon,
+            contentDescription = null,
+            tint = Color.Unspecified,
+            modifier = Modifier.size(20.dp)
+        )
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = text, color = contentColor, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
