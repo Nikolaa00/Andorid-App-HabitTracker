@@ -48,28 +48,6 @@ fun ProfileSettingsScreen(navController: NavController) {
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = stringResource(R.string.profile_subtitle),
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    StatCard(
-                        label = stringResource(R.string.label_streak),
-                        value = stringResource(R.string.value_streak_days),
-                        modifier = Modifier.weight(1f),
-                        accentColor = Color(0xFF2E7D32)
-                    )
-                    StatCard(
-                        label = stringResource(R.string.label_completed),
-                        value = stringResource(R.string.completion_value),
-                        modifier = Modifier.weight(1f),
-                        accentColor = Color(0xFF1A73E8)
-                    )
-                }
             }
         }
 
