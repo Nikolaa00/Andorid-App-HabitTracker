@@ -20,17 +20,38 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.habittrackerapp.R
+import com.example.habittrackerapp.ui.screens.components.ReminderDialog
 import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
+import com.example.habittrackerapp.viewmodel.CreateHabitViewModel
+import java.time.format.DateTimeFormatter
 
 @Composable
-fun CreateHabitScreen(navController: NavController) {
+fun CreateHabitScreen(
+    navController: NavController,
+    viewModel: CreateHabitViewModel = hiltViewModel()
+) {
     var habitName by remember { mutableStateOf("") }
     var habitDescription by remember { mutableStateOf("") }
     var selectedDays by remember { mutableStateOf(setOf(0, 1, 2, 3, 4)) }
-    var dailyGoal by remember { mutableStateOf(8) }
+    var dailyGoal by remember { mutableIntStateOf(8) }
+
+    val reminders by viewModel.reminders.collectAsState()
+    var showReminderDialog by remember { mutableStateOf(false) }
+    val timeFormatter = remember { DateTimeFormatter.ofPattern("hh:mm a") }
+
+    if (showReminderDialog) {
+        ReminderDialog(
+            onDismiss = { showReminderDialog = false },
+            onConfirm = { time ->
+                viewModel.addReminder(time)
+                showReminderDialog = false
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -163,14 +184,62 @@ fun CreateHabitScreen(navController: NavController) {
                 Text(text = stringResource(R.string.reminders_description), fontSize = 14.sp, color = Color.Gray)
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(color = Color(0xFFE3F2FD), shape = RoundedCornerShape(12.dp)) {
-                        Text(text = stringResource(R.string.reminder_time_default), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), color = Color(0xFF1A73E8), fontWeight = FontWeight.Bold)
+                // Reminders List
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    reminders.forEach { time ->
+                        Surface(
+                            color = Color(0xFFE3F2FD),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.clickable { viewModel.removeReminder(time) }
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                            ) {
+                                Text(
+                                    text = time.format(timeFormatter),
+                                    color = Color(0xFF1A73E8),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = null,
+                                    tint = Color(0xFF1A73E8),
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
                     }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    IconButton(onClick = {}, modifier = Modifier.border(1.dp, LightGrayBorder, CircleShape)) {
-                        Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
+
+                    // Add Button
+                    IconButton(
+                        onClick = { showReminderDialog = true },
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(Color(0xFFE3F2FD), CircleShape)
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = null,
+                            tint = Color(0xFF1A73E8),
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
+                }
+
+                if (reminders.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.no_reminders),
+                        fontSize = 12.sp,
+                        color = Color.LightGray,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 }
             }
         }
