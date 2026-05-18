@@ -10,6 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,119 +25,127 @@ import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
 
 @Composable
-fun DashboardScreen() {
-    Column(
+fun DashboardScreen(windowSizeClass: WindowSizeClass) {
+    val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
+    val horizontalPadding = if (isPhoneLandscape) 32.dp else 16.dp
+    val spacing = if (isPhoneLandscape) 8.dp else 16.dp
+
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8FAFC))
-            .padding(16.dp)
+            .padding(horizontal = horizontalPadding),
+        contentPadding = PaddingValues(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(spacing)
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Text(
-                    text = stringResource(R.string.greeting_user),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E293B)
-                )
-                Text(
-                    text = stringResource(R.string.streak_info),
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
+        // Greeting Card
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(modifier = Modifier.padding(if (isPhoneLandscape) 16.dp else 24.dp)) {
+                    Text(
+                        text = stringResource(R.string.greeting_user),
+                        fontSize = if (isPhoneLandscape) 20.sp else 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1E293B)
+                    )
+                    Text(
+                        text = stringResource(R.string.streak_info),
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Text(
-                    text = stringResource(R.string.daily_progress),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.progress_subtext),
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                LinearProgressIndicator(
-                    progress = { 4f / 6f },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(12.dp)
-                        .background(Color(0xFFE2E8F0), CircleShape),
-                    color = EmeraldGreen,
-                    strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
-                )
+        // Daily Progress Card
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(modifier = Modifier.padding(if (isPhoneLandscape) 16.dp else 24.dp)) {
+                    Text(
+                        text = stringResource(R.string.daily_progress),
+                        fontSize = if (isPhoneLandscape) 18.sp else 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.progress_subtext),
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                    Spacer(modifier = Modifier.height(spacing))
+                    LinearProgressIndicator(
+                        progress = { 4f / 6f },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(if (isPhoneLandscape) 8.dp else 12.dp)
+                            .background(Color(0xFFE2E8F0), CircleShape),
+                        color = EmeraldGreen,
+                        strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+                    )
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.todays_habits),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Surface(
-                color = Color(0xFFF1F5F9),
-                shape = RoundedCornerShape(12.dp)
+        // Section Title
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.done_badge),
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF64748B)
+                    text = stringResource(R.string.todays_habits),
+                    fontSize = if (isPhoneLandscape) 18.sp else 20.sp,
+                    fontWeight = FontWeight.Bold
                 )
+                Surface(
+                    color = Color(0xFFF1F5F9),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.done_badge),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF64748B)
+                    )
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-            item {
-                HabitItem(
-                    title = stringResource(R.string.habit_hydration),
-                    subtitle = "2.5L / 3L",
-                    isCompleted = false
-                )
-            }
-            item {
-                HabitItem(
-                    title = stringResource(R.string.habit_mindfulness),
-                    subtitle = "15 min Session",
-                    isCompleted = true
-                )
-            }
-            item {
-                HabitItem(
-                    title = stringResource(R.string.habit_walk),
-                    subtitle = "30 min at 6 PM",
-                    isCompleted = false
-                )
-            }
+        // Habit Items
+        item {
+            HabitItem(
+                title = stringResource(R.string.habit_hydration),
+                subtitle = "2.5L / 3L",
+                isCompleted = false
+            )
+        }
+        item {
+            HabitItem(
+                title = stringResource(R.string.habit_mindfulness),
+                subtitle = "15 min Session",
+                isCompleted = true
+            )
+        }
+        item {
+            HabitItem(
+                title = stringResource(R.string.habit_walk),
+                subtitle = "30 min at 6 PM",
+                isCompleted = false
+            )
         }
     }
 }

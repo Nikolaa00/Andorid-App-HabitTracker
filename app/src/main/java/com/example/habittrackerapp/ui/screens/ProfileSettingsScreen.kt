@@ -3,11 +3,15 @@ package com.example.habittrackerapp.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,15 +27,23 @@ import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
 
 @Composable
-fun ProfileSettingsScreen(navController: NavController) {
+fun ProfileSettingsScreen(
+    navController: NavController,
+    windowSizeClass: WindowSizeClass
+) {
     var notificationsEnabled by remember { mutableStateOf(true) }
+    val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
+    val spacing = if (isPhoneLandscape) 8.dp else 16.dp
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8FAFC))
-            .padding(16.dp)
+            .padding(horizontal = if (isPhoneLandscape) 32.dp else 16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
+        Spacer(modifier = Modifier.height(spacing))
+        
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -40,18 +52,18 @@ fun ProfileSettingsScreen(navController: NavController) {
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(if (isPhoneLandscape) 16.dp else 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = stringResource(R.string.profile_name),
-                    fontSize = 28.sp,
+                    fontSize = if (isPhoneLandscape) 22.sp else 28.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(spacing))
 
         Card(
             modifier = Modifier
@@ -60,15 +72,15 @@ fun ProfileSettingsScreen(navController: NavController) {
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
-            Column(modifier = Modifier.padding(24.dp)) {
+            Column(modifier = Modifier.padding(if (isPhoneLandscape) 16.dp else 24.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Notifications, contentDescription = null, tint = Color(0xFF1A73E8))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.header_preferences), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.header_preferences), fontSize = if (isPhoneLandscape) 18.sp else 20.sp, fontWeight = FontWeight.Bold)
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(if (isPhoneLandscape) 4.dp else 8.dp))
                 Text(text = stringResource(R.string.desc_preferences), fontSize = 14.sp, color = Color.Gray)
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(spacing))
                 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -85,7 +97,7 @@ fun ProfileSettingsScreen(navController: NavController) {
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(spacing))
 
         Card(
             modifier = Modifier
@@ -94,21 +106,21 @@ fun ProfileSettingsScreen(navController: NavController) {
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
-            Column(modifier = Modifier.padding(24.dp)) {
+            Column(modifier = Modifier.padding(if (isPhoneLandscape) 16.dp else 24.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFD32F2F))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.header_danger_zone), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.header_danger_zone), fontSize = if (isPhoneLandscape) 18.sp else 20.sp, fontWeight = FontWeight.Bold)
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(if (isPhoneLandscape) 4.dp else 8.dp))
                 Text(text = stringResource(R.string.desc_danger_zone), fontSize = 14.sp, color = Color.Gray)
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(if (isPhoneLandscape) 16.dp else 24.dp))
                 
                 OutlinedButton(
                     onClick = { navController.navigate(Screen.Welcome.route) {
                         popUpTo(0)
                     } },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    modifier = Modifier.fillMaxWidth().height(if (isPhoneLandscape) 48.dp else 56.dp),
                     shape = RoundedCornerShape(28.dp),
                     border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)
                 ) {
@@ -116,6 +128,8 @@ fun ProfileSettingsScreen(navController: NavController) {
                 }
             }
         }
+        
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 

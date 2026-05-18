@@ -42,10 +42,13 @@ fun SetupNavGraph(
             )
         }
         composable(route = Screen.Home.route) {
-            DashboardScreen()
+            DashboardScreen(windowSizeClass = windowSizeClass)
         }
         composable(route = Screen.Profile.route) {
-            ProfileSettingsScreen(navController = navController)
+            ProfileSettingsScreen(
+                navController = navController,
+                windowSizeClass = windowSizeClass
+            )
         }
         composable(route = Screen.CreateHabit.route) {
             CreateHabitScreen(
