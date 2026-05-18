@@ -39,6 +39,7 @@ fun SignInScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
+    // Logic: Include both Medium and Expanded width classes as "Large Screen" (Tablets)
     val isLargeScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
     val horizontalPadding = if (isLargeScreen) 80.dp else 24.dp
 
@@ -46,14 +47,23 @@ fun SignInScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FA)),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center // Ensures horizontal & vertical centering of the container
     ) {
         LazyColumn(
             modifier = Modifier
-                .then(if (isLargeScreen) Modifier.width(600.dp).fillMaxHeight() else Modifier.fillMaxWidth())
+                .then(
+                    if (isLargeScreen) 
+                        Modifier.width(600.dp).fillMaxHeight() 
+                    else 
+                        Modifier.fillMaxWidth()
+                )
                 .padding(horizontal = horizontalPadding, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = if (isLargeScreen) Arrangement.spacedBy(16.dp, Alignment.CenterVertically) else Arrangement.spacedBy(16.dp)
+            // Vertical centering of items for tablets/large screens
+            verticalArrangement = if (isLargeScreen) 
+                Arrangement.spacedBy(16.dp, Alignment.CenterVertically) 
+            else 
+                Arrangement.spacedBy(16.dp)
         ) {
             // Header Section
             item {
