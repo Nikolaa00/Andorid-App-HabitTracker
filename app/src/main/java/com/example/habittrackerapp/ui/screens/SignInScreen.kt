@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
@@ -39,15 +40,17 @@ fun SignInScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // Logic: Include both Medium and Expanded width classes as "Large Screen" (Tablets)
     val isLargeScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+    val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
+    
     val horizontalPadding = if (isLargeScreen) 80.dp else 24.dp
+    val verticalPadding = if (isPhoneLandscape) 8.dp else 32.dp
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FA)),
-        contentAlignment = Alignment.Center // Ensures horizontal & vertical centering of the container
+        contentAlignment = Alignment.Center
     ) {
         LazyColumn(
             modifier = Modifier
@@ -57,13 +60,12 @@ fun SignInScreen(
                     else 
                         Modifier.fillMaxWidth()
                 )
-                .padding(horizontal = horizontalPadding, vertical = 32.dp),
+                .padding(horizontal = horizontalPadding, vertical = verticalPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            // Vertical centering of items for tablets/large screens
             verticalArrangement = if (isLargeScreen) 
                 Arrangement.spacedBy(16.dp, Alignment.CenterVertically) 
             else 
-                Arrangement.spacedBy(16.dp)
+                Arrangement.spacedBy(if (isPhoneLandscape) 8.dp else 16.dp)
         ) {
             // Header Section
             item {
@@ -75,12 +77,15 @@ fun SignInScreen(
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(if (isPhoneLandscape) 12.dp else 24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        // Logo box scaled down for landscape
                         Box(
                             modifier = Modifier
-                                .size(64.dp)
+                                .size(if (isPhoneLandscape) 40.dp else 64.dp)
                                 .background(Color(0xFFE8F5E9), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
@@ -88,24 +93,25 @@ fun SignInScreen(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = null,
                                 tint = EmeraldGreen,
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(if (isPhoneLandscape) 20.dp else 32.dp)
                             )
                         }
-
-                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 24.dp))
 
                         Text(
                             text = stringResource(R.string.welcome_back),
-                            fontSize = 24.sp,
+                            fontSize = if (isPhoneLandscape) 20.sp else 24.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1A237E)
+                            color = Color(0xFF1A237E),
+                            textAlign = TextAlign.Center
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 4.dp else 8.dp))
+                        
                         Text(
                             text = stringResource(R.string.sign_in_to_continue),
-                            fontSize = 14.sp,
+                            fontSize = if (isPhoneLandscape) 12.sp else 14.sp,
                             color = Color.Gray,
                             textAlign = TextAlign.Center
                         )
@@ -122,7 +128,7 @@ fun SignInScreen(
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    Column(modifier = Modifier.padding(24.dp)) {
+                    Column(modifier = Modifier.padding(if (isPhoneLandscape) 12.dp else 24.dp)) {
                         Text(
                             text = stringResource(R.string.email_address_label),
                             fontSize = 12.sp,
@@ -141,7 +147,7 @@ fun SignInScreen(
                             )
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 16.dp))
 
                         Text(
                             text = stringResource(R.string.password_label),
@@ -170,7 +176,7 @@ fun SignInScreen(
                             )
                         )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 12.dp else 24.dp))
 
                         Button(
                             onClick = { navController.navigate(Screen.Home.route) },
@@ -203,7 +209,7 @@ fun SignInScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp),
+                            .padding(if (isPhoneLandscape) 4.dp else 8.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
