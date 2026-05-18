@@ -22,7 +22,10 @@ fun SetupNavGraph(
             SplashScreen(navController = navController)
         }
         composable(route = Screen.Welcome.route) {
-            WelcomeScreen(navController = navController)
+            WelcomeScreen(
+                navController = navController,
+                windowSizeClass = windowSizeClass
+            )
         }
         composable(route = Screen.Login.route) {
             SignInScreen(

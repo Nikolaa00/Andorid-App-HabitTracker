@@ -43,21 +43,21 @@ fun RegisterScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
-    val isTablet = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
-    val horizontalPadding = if (isTablet) 80.dp else 24.dp
+    val isLargeScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+    val horizontalPadding = if (isLargeScreen) 80.dp else 24.dp
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FA)),
-        contentAlignment = Alignment.TopCenter
+        contentAlignment = Alignment.Center
     ) {
         LazyColumn(
             modifier = Modifier
-                .then(if (isTablet) Modifier.width(600.dp) else Modifier.fillMaxWidth())
+                .then(if (isLargeScreen) Modifier.width(600.dp).fillMaxHeight() else Modifier.fillMaxWidth())
                 .padding(horizontal = horizontalPadding, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = if (isLargeScreen) Arrangement.spacedBy(16.dp, Alignment.CenterVertically) else Arrangement.spacedBy(16.dp)
         ) {
             item {
                 Card(
@@ -242,7 +242,7 @@ fun RegisterScreen(
             // Footer Section
             item {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(0.dp,0.dp,0.dp,5.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
