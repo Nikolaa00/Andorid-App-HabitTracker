@@ -152,14 +152,14 @@ private fun TwoPaneLayout(
     Row(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         // Left Column
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
         ) {
             GeneralInfoCard(habitName, onHabitNameChange, habitDescription, onHabitDescriptionChange)
             Spacer(modifier = Modifier.height(16.dp))
@@ -170,7 +170,6 @@ private fun TwoPaneLayout(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
         ) {
             DailyGoalCard(dailyGoal, onDailyGoalChange)
             Spacer(modifier = Modifier.height(16.dp))
