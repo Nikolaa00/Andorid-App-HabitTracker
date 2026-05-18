@@ -11,6 +11,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +34,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun CreateHabitScreen(
     navController: NavController,
+    windowSizeClass: WindowSizeClass,
     viewModel: CreateHabitViewModel = hiltViewModel()
 ) {
     var habitName by remember { mutableStateOf("") }
@@ -53,209 +56,349 @@ fun CreateHabitScreen(
         )
     }
 
-    Column(
+    val isExpanded = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8FAFC))
+    ) {
+        if (isExpanded) {
+            TwoPaneLayout(
+                habitName = habitName,
+                onHabitNameChange = { habitName = it },
+                habitDescription = habitDescription,
+                onHabitDescriptionChange = { habitDescription = it },
+                selectedDays = selectedDays,
+                onSelectedDaysChange = { selectedDays = it },
+                dailyGoal = dailyGoal,
+                onDailyGoalChange = { dailyGoal = it },
+                reminders = reminders,
+                timeFormatter = timeFormatter,
+                onAddReminderClick = { showReminderDialog = true },
+                onRemoveReminder = { viewModel.removeReminder(it) },
+                onCreateClick = { navController.popBackStack() }
+            )
+        } else {
+            SinglePaneLayout(
+                habitName = habitName,
+                onHabitNameChange = { habitName = it },
+                habitDescription = habitDescription,
+                onHabitDescriptionChange = { habitDescription = it },
+                selectedDays = selectedDays,
+                onSelectedDaysChange = { selectedDays = it },
+                dailyGoal = dailyGoal,
+                onDailyGoalChange = { dailyGoal = it },
+                reminders = reminders,
+                timeFormatter = timeFormatter,
+                onAddReminderClick = { showReminderDialog = true },
+                onRemoveReminder = { viewModel.removeReminder(it) },
+                onCreateClick = { navController.popBackStack() }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SinglePaneLayout(
+    habitName: String,
+    onHabitNameChange: (String) -> Unit,
+    habitDescription: String,
+    onHabitDescriptionChange: (String) -> Unit,
+    selectedDays: Set<Int>,
+    onSelectedDaysChange: (Set<Int>) -> Unit,
+    dailyGoal: Int,
+    onDailyGoalChange: (Int) -> Unit,
+    reminders: List<java.time.LocalTime>,
+    timeFormatter: DateTimeFormatter,
+    onAddReminderClick: () -> Unit,
+    onRemoveReminder: (java.time.LocalTime) -> Unit,
+    onCreateClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+        GeneralInfoCard(habitName, onHabitNameChange, habitDescription, onHabitDescriptionChange)
+        Spacer(modifier = Modifier.height(16.dp))
+        FrequencyCard(selectedDays, onSelectedDaysChange)
+        Spacer(modifier = Modifier.height(16.dp))
+        DailyGoalCard(dailyGoal, onDailyGoalChange)
+        Spacer(modifier = Modifier.height(16.dp))
+        RemindersCard(reminders, timeFormatter, onAddReminderClick, onRemoveReminder)
+        Spacer(modifier = Modifier.height(24.dp))
+        CreateButton(onCreateClick)
+    }
+}
+
+@Composable
+private fun TwoPaneLayout(
+    habitName: String,
+    onHabitNameChange: (String) -> Unit,
+    habitDescription: String,
+    onHabitDescriptionChange: (String) -> Unit,
+    selectedDays: Set<Int>,
+    onSelectedDaysChange: (Set<Int>) -> Unit,
+    dailyGoal: Int,
+    onDailyGoalChange: (Int) -> Unit,
+    reminders: List<java.time.LocalTime>,
+    timeFormatter: DateTimeFormatter,
+    onAddReminderClick: () -> Unit,
+    onRemoveReminder: (java.time.LocalTime) -> Unit,
+    onCreateClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        // Left Column
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.EditNote, contentDescription = null, tint = EmeraldGreen)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.header_general), fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Text(text = stringResource(R.string.label_habit_name), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                OutlinedTextField(
-                    value = habitName,
-                    onValueChange = { habitName = it },
-                    placeholder = { Text(stringResource(R.string.hint_habit_name)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = LightGrayBorder)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(text = stringResource(R.string.label_habit_desc), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                OutlinedTextField(
-                    value = habitDescription,
-                    onValueChange = { habitDescription = it },
-                    placeholder = { Text(stringResource(R.string.hint_habit_desc)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = LightGrayBorder)
-                )
-            }
+            GeneralInfoCard(habitName, onHabitNameChange, habitDescription, onHabitDescriptionChange)
+            Spacer(modifier = Modifier.height(16.dp))
+            FrequencyCard(selectedDays, onSelectedDaysChange)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+        // Right Column
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.CalendarToday, contentDescription = null, tint = EmeraldGreen)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.header_frequency), fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    val days = listOf(
-                        stringResource(R.string.day_m), stringResource(R.string.day_t), stringResource(R.string.day_w),
-                        stringResource(R.string.day_th), stringResource(R.string.day_f), stringResource(R.string.day_s),
-                        stringResource(R.string.day_su)
+            DailyGoalCard(dailyGoal, onDailyGoalChange)
+            Spacer(modifier = Modifier.height(16.dp))
+            RemindersCard(reminders, timeFormatter, onAddReminderClick, onRemoveReminder)
+            Spacer(modifier = Modifier.height(24.dp))
+            CreateButton(onCreateClick)
+        }
+    }
+}
+
+@Composable
+private fun GeneralInfoCard(
+    habitName: String,
+    onHabitNameChange: (String) -> Unit,
+    habitDescription: String,
+    onHabitDescriptionChange: (String) -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.EditNote, contentDescription = null, tint = EmeraldGreen)
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(text = stringResource(R.string.header_general), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(text = stringResource(R.string.label_habit_name), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+            OutlinedTextField(
+                value = habitName,
+                onValueChange = onHabitNameChange,
+                placeholder = { Text(stringResource(R.string.hint_habit_name)) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = LightGrayBorder)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(text = stringResource(R.string.label_habit_desc), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+            OutlinedTextField(
+                value = habitDescription,
+                onValueChange = onHabitDescriptionChange,
+                placeholder = { Text(stringResource(R.string.hint_habit_desc)) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = LightGrayBorder)
+            )
+        }
+    }
+}
+
+@Composable
+private fun FrequencyCard(
+    selectedDays: Set<Int>,
+    onSelectedDaysChange: (Set<Int>) -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.CalendarToday, contentDescription = null, tint = EmeraldGreen)
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(text = stringResource(R.string.header_frequency), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                val days = listOf(
+                    stringResource(R.string.day_m), stringResource(R.string.day_t), stringResource(R.string.day_w),
+                    stringResource(R.string.day_th), stringResource(R.string.day_f), stringResource(R.string.day_s),
+                    stringResource(R.string.day_su)
+                )
+                days.forEachIndexed { index, day ->
+                    DayChip(
+                        label = day,
+                        isSelected = index in selectedDays,
+                        onClick = {
+                            onSelectedDaysChange(if (index in selectedDays) selectedDays - index else selectedDays + index)
+                        }
                     )
-                    days.forEachIndexed { index, day ->
-                        DayChip(
-                            label = day,
-                            isSelected = index in selectedDays,
-                            onClick = {
-                                selectedDays = if (index in selectedDays) selectedDays - index else selectedDays + index
-                            }
-                        )
-                    }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = stringResource(R.string.frequency_subtext), fontSize = 14.sp, color = Color.Gray)
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(R.string.frequency_subtext), fontSize = 14.sp, color = Color.Gray)
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.TrackChanges, contentDescription = null, tint = EmeraldGreen)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.header_goal), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+@Composable
+private fun DailyGoalCard(
+    dailyGoal: Int,
+    onDailyGoalChange: (Int) -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.TrackChanges, contentDescription = null, tint = EmeraldGreen)
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(text = stringResource(R.string.header_goal), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFFF1F5F9)).padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButton(onClick = { if (dailyGoal > 1) onDailyGoalChange(dailyGoal - 1) }, modifier = Modifier.background(Color.White, CircleShape)) {
+                    Icon(Icons.Default.Remove, contentDescription = null)
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFFF1F5F9)).padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IconButton(onClick = { if (dailyGoal > 1) dailyGoal-- }, modifier = Modifier.background(Color.White, CircleShape)) {
-                        Icon(Icons.Default.Remove, contentDescription = null)
-                    }
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = dailyGoal.toString(), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                        Text(text = stringResource(R.string.counter_times_per_day), fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                    }
-                    IconButton(onClick = { dailyGoal++ }, modifier = Modifier.background(Color.White, CircleShape)) {
-                        Icon(Icons.Default.Add, contentDescription = null)
-                    }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = dailyGoal.toString(), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.counter_times_per_day), fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                }
+                IconButton(onClick = { onDailyGoalChange(dailyGoal + 1) }, modifier = Modifier.background(Color.White, CircleShape)) {
+                    Icon(Icons.Default.Add, contentDescription = null)
                 }
             }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.NotificationsActive, contentDescription = null, tint = EmeraldGreen)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = stringResource(R.string.header_reminders), fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = stringResource(R.string.reminders_description), fontSize = 14.sp, color = Color.Gray)
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Reminders List
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    reminders.forEach { time ->
-                        Surface(
-                            color = Color(0xFFE3F2FD),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.clickable { viewModel.removeReminder(time) }
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RemindersCard(
+    reminders: List<java.time.LocalTime>,
+    timeFormatter: DateTimeFormatter,
+    onAddReminderClick: () -> Unit,
+    onRemoveReminder: (java.time.LocalTime) -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.NotificationsActive, contentDescription = null, tint = EmeraldGreen)
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(text = stringResource(R.string.header_reminders), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = stringResource(R.string.reminders_description), fontSize = 14.sp, color = Color.Gray)
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Reminders List
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                reminders.forEach { time ->
+                    Surface(
+                        color = Color(0xFFE3F2FD),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.clickable { onRemoveReminder(time) }
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                            ) {
-                                Text(
-                                    text = time.format(timeFormatter),
-                                    color = Color(0xFF1A73E8),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 14.sp
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Icon(
-                                    Icons.Default.Close,
-                                    contentDescription = null,
-                                    tint = Color(0xFF1A73E8),
-                                    modifier = Modifier.size(14.dp)
-                                )
-                            }
+                            Text(
+                                text = time.format(timeFormatter),
+                                color = Color(0xFF1A73E8),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = null,
+                                tint = Color(0xFF1A73E8),
+                                modifier = Modifier.size(14.dp)
+                            )
                         }
                     }
-
-                    // Add Button
-                    IconButton(
-                        onClick = { showReminderDialog = true },
-                        modifier = Modifier
-                            .size(36.dp)
-                            .background(Color(0xFFE3F2FD), CircleShape)
-                    ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = null,
-                            tint = Color(0xFF1A73E8),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
                 }
 
-                if (reminders.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.no_reminders),
-                        fontSize = 12.sp,
-                        color = Color.LightGray,
-                        modifier = Modifier.padding(top = 8.dp)
+                // Add Button
+                IconButton(
+                    onClick = onAddReminderClick,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .background(Color(0xFFE3F2FD), CircleShape)
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = null,
+                        tint = Color(0xFF1A73E8),
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier.fillMaxWidth().height(64.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A)),
-            shape = RoundedCornerShape(32.dp)
-        ) {
-            Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(24.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = stringResource(R.string.btn_create_habit), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            if (reminders.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.no_reminders),
+                    fontSize = 12.sp,
+                    color = Color.LightGray,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun CreateButton(onCreateClick: () -> Unit) {
+    Button(
+        onClick = onCreateClick,
+        modifier = Modifier.fillMaxWidth().height(64.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F172A)),
+        shape = RoundedCornerShape(32.dp)
+    ) {
+        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(24.dp))
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = stringResource(R.string.btn_create_habit), fontSize = 20.sp, fontWeight = FontWeight.Bold)
     }
 }
 

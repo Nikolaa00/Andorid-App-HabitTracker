@@ -25,7 +25,10 @@ fun SetupNavGraph(
             WelcomeScreen(navController = navController)
         }
         composable(route = Screen.Login.route) {
-            SignInScreen(navController = navController)
+            SignInScreen(
+                navController = navController,
+                windowSizeClass = windowSizeClass
+            )
         }
         composable(route = Screen.Register.route) {
             val viewModel: RegisterViewModel = hiltViewModel() // ✅ safe here
@@ -42,7 +45,10 @@ fun SetupNavGraph(
             ProfileSettingsScreen(navController = navController)
         }
         composable(route = Screen.CreateHabit.route) {
-            CreateHabitScreen(navController = navController)
+            CreateHabitScreen(
+                navController = navController,
+                windowSizeClass = windowSizeClass
+            )
         }
     }
 }
