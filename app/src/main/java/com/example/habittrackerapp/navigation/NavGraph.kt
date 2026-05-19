@@ -22,10 +22,16 @@ fun SetupNavGraph(
             SplashScreen(navController = navController)
         }
         composable(route = Screen.Welcome.route) {
-            WelcomeScreen(navController = navController)
+            WelcomeScreen(
+                navController = navController,
+                windowSizeClass = windowSizeClass
+            )
         }
         composable(route = Screen.Login.route) {
-            SignInScreen(navController = navController)
+            SignInScreen(
+                navController = navController,
+                windowSizeClass = windowSizeClass
+            )
         }
         composable(route = Screen.Register.route) {
             val viewModel: RegisterViewModel = hiltViewModel() // ✅ safe here
@@ -36,13 +42,19 @@ fun SetupNavGraph(
             )
         }
         composable(route = Screen.Home.route) {
-            DashboardScreen()
+            DashboardScreen(windowSizeClass = windowSizeClass)
         }
         composable(route = Screen.Profile.route) {
-            ProfileSettingsScreen(navController = navController)
+            ProfileSettingsScreen(
+                navController = navController,
+                windowSizeClass = windowSizeClass
+            )
         }
         composable(route = Screen.CreateHabit.route) {
-            CreateHabitScreen(navController = navController)
+            CreateHabitScreen(
+                navController = navController,
+                windowSizeClass = windowSizeClass
+            )
         }
     }
 }

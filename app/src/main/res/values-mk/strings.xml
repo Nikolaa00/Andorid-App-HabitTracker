@@ -74,4 +74,12 @@
     <string name="reminders_description">Поставете известување за да останете во тек со вашата навика.</string>
     <string name="reminder_time_default">08:00 наутро</string>
     <string name="btn_create_habit">Креирај навика</string>
+    <string name="dialog_set_reminder">Постави потсетник</string>
+    <string name="btn_add_reminder">Додај потсетник</string>
+    <string name="btn_cancel">Откажи</string>
+    <string name="label_hours">ЧАСОВИ</string>
+    <string name="label_minutes">МИНУТИ</string>
+    <string name="label_am">AM</string>
+    <string name="label_pm">PM</string>
+    <string name="no_reminders">Нема поставени потсетници</string>
 </resources>

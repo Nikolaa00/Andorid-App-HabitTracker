@@ -74,4 +74,12 @@
     <string name="reminders_description">Set a notification to keep you on track with your habit.</string>
     <string name="reminder_time_default">08:00 AM</string>
     <string name="btn_create_habit">Create Habit</string>
+    <string name="dialog_set_reminder">Set Reminder</string>
+    <string name="btn_add_reminder">Add Reminder</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="label_hours">HOURS</string>
+    <string name="label_minutes">MINUTES</string>
+    <string name="label_am">AM</string>
+    <string name="label_pm">PM</string>
+    <string name="no_reminders">No reminders set</string>
 </resources>

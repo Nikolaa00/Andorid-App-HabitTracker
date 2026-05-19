@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
@@ -43,21 +44,27 @@ fun RegisterScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
-    val isTablet = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
-    val horizontalPadding = if (isTablet) 80.dp else 24.dp
+    val isLargeScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+    val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
+    
+    val horizontalPadding = if (isLargeScreen) 80.dp else 24.dp
+    val verticalPadding = if (isPhoneLandscape) 8.dp else 32.dp
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FA)),
-        contentAlignment = Alignment.TopCenter
+        contentAlignment = Alignment.Center
     ) {
         LazyColumn(
             modifier = Modifier
-                .then(if (isTablet) Modifier.width(600.dp) else Modifier.fillMaxWidth())
-                .padding(horizontal = horizontalPadding, vertical = 32.dp),
+                .then(if (isLargeScreen) Modifier.width(600.dp).fillMaxHeight() else Modifier.fillMaxWidth())
+                .padding(horizontal = horizontalPadding, vertical = verticalPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = if (isLargeScreen) 
+                Arrangement.spacedBy(16.dp, Alignment.CenterVertically) 
+            else 
+                Arrangement.spacedBy(if (isPhoneLandscape) 8.dp else 16.dp)
         ) {
             item {
                 Card(
@@ -69,13 +76,14 @@ fun RegisterScreen(
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
+                            .fillMaxWidth()
+                            .padding(if (isPhoneLandscape) 12.dp else 24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
+                        // Scaled down logo for phone landscape
                         Box(
                             modifier = Modifier
-                                .size(64.dp)
+                                .size(if (isPhoneLandscape) 40.dp else 64.dp)
                                 .background(Color(0xFFE8F5E9), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
@@ -83,24 +91,24 @@ fun RegisterScreen(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = null,
                                 tint = EmeraldGreen,
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(if (isPhoneLandscape) 20.dp else 32.dp)
                             )
                         }
-
-                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 24.dp))
 
                         Text(
                             text = stringResource(R.string.create_account),
-                            fontSize = 24.sp,
+                            fontSize = if (isPhoneLandscape) 20.sp else 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF1A237E)
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 4.dp else 8.dp))
+                        
                         Text(
                             text = stringResource(R.string.start_building_better_habits),
-                            fontSize = 14.sp,
+                            fontSize = if (isPhoneLandscape) 12.sp else 14.sp,
                             color = Color.Gray,
                             textAlign = TextAlign.Center
                         )
@@ -116,21 +124,21 @@ fun RegisterScreen(
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    Column(modifier = Modifier.padding(24.dp)) {
+                    Column(modifier = Modifier.padding(if (isPhoneLandscape) 12.dp else 24.dp)) {
                         RegisterInputField(
                             label = stringResource(R.string.username_label),
                             value = username,
                             onValueChange = viewModel::onUsernameChange,
                             placeholder = stringResource(R.string.username_hint),
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 16.dp))
                         RegisterInputField(
                             label = stringResource(R.string.email_address_full),
                             value = email,
                             onValueChange = viewModel::onEmailChange,
                             placeholder = stringResource(R.string.email_address_hint),
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 16.dp))
                         RegisterInputField(
                             label = stringResource(R.string.password_label),
                             value = password,
@@ -138,7 +146,7 @@ fun RegisterScreen(
                             placeholder = "••••••••",
                             isPassword = true
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 16.dp))
                         RegisterInputField(
                             label = stringResource(R.string.confirm_password_label),
                             value = confirmPassword,
@@ -156,7 +164,7 @@ fun RegisterScreen(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 12.dp else 24.dp))
 
                         Button(
                             onClick = { viewModel.register { navController.navigate(Screen.Home.route) } },
@@ -179,7 +187,7 @@ fun RegisterScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 12.dp else 24.dp))
 
                         // OR Divider
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -193,7 +201,7 @@ fun RegisterScreen(
                             HorizontalDivider(modifier = Modifier.weight(1f), color = LightGrayBorder)
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 12.dp else 24.dp))
 
                         // Social Buttons
                         Row(
@@ -218,7 +226,7 @@ fun RegisterScreen(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 16.dp))
 
                         // Continue as Guest
                         OutlinedButton(
@@ -242,7 +250,7 @@ fun RegisterScreen(
             // Footer Section
             item {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(0.dp,0.dp,0.dp,5.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -251,7 +259,7 @@ fun RegisterScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp),
+                            .padding(if (isPhoneLandscape) 4.dp else 8.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
