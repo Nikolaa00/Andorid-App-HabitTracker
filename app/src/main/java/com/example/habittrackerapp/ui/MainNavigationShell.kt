@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -32,7 +31,8 @@ import com.example.habittrackerapp.util.LocaleHelper
 @Composable
 fun MainNavigationShell(
     navController: NavHostController,
-    windowSizeClass: WindowSizeClass
+    windowSizeClass: WindowSizeClass,
+    startDestination: String
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -42,10 +42,6 @@ fun MainNavigationShell(
     val isTablet = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
     val bottomBarScreens = listOf(Screen.Home.route, Screen.Profile.route, Screen.CreateHabit.route)
     val showNavigation = currentDestination?.route in bottomBarScreens
-
-    // ✅ NO CompositionLocalProvider wrapping anything
-    // ✅ NO createConfigurationContext()
-    // Locale is handled via AppCompatDelegate which triggers Activity recreation safely
 
     Scaffold(
         topBar = {
@@ -64,8 +60,6 @@ fun MainNavigationShell(
                             onLanguageChange = { lang ->
                                 LocaleHelper.setLocale(lang)
                                 currentLanguage.value = lang
-                                // ✅ This triggers Activity recreation automatically
-                                // Hilt context chain stays intact
                                 AppCompatDelegate.setApplicationLocales(
                                     LocaleListCompat.forLanguageTags(lang)
                                 )
@@ -118,7 +112,7 @@ fun MainNavigationShell(
                     containerColor = Color.White,
                     header = {
                         Icon(
-                            imageVector = Icons.Default.CheckCircle,
+                            imageVector = Icons.Default.AddCircle, // Replaced CheckCircle with AddCircle as placeholder or similar
                             contentDescription = null,
                             tint = com.example.habittrackerapp.ui.theme.EmeraldGreen,
                             modifier = Modifier.size(48.dp).padding(vertical = 16.dp)
@@ -157,7 +151,11 @@ fun MainNavigationShell(
                 }
             }
             Box(modifier = Modifier.fillMaxSize()) {
-                SetupNavGraph(navController = navController, windowSizeClass = windowSizeClass)
+                SetupNavGraph(
+                    navController = navController,
+                    windowSizeClass = windowSizeClass,
+                    startDestination = startDestination
+                )
             }
         }
     }

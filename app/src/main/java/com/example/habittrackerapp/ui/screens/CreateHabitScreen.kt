@@ -37,12 +37,12 @@ fun CreateHabitScreen(
     windowSizeClass: WindowSizeClass,
     viewModel: CreateHabitViewModel = hiltViewModel()
 ) {
-    var habitName by remember { mutableStateOf("") }
-    var habitDescription by remember { mutableStateOf("") }
-    var selectedDays by remember { mutableStateOf(setOf(0, 1, 2, 3, 4)) }
-    var dailyGoal by remember { mutableIntStateOf(8) }
-
+    val name by viewModel.name.collectAsState()
+    val description by viewModel.description.collectAsState()
+    val dailyGoal by viewModel.dailyGoal.collectAsState()
+    val frequency by viewModel.frequency.collectAsState()
     val reminders by viewModel.reminders.collectAsState()
+
     var showReminderDialog by remember { mutableStateOf(false) }
     val timeFormatter = remember { DateTimeFormatter.ofPattern("hh:mm a") }
 
@@ -56,7 +56,7 @@ fun CreateHabitScreen(
         )
     }
 
-    val isExpanded = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+    val isExpanded = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Expanded
 
     Box(
         modifier = Modifier
@@ -65,35 +65,43 @@ fun CreateHabitScreen(
     ) {
         if (isExpanded) {
             TwoPaneLayout(
-                habitName = habitName,
-                onHabitNameChange = { habitName = it },
-                habitDescription = habitDescription,
-                onHabitDescriptionChange = { habitDescription = it },
-                selectedDays = selectedDays,
-                onSelectedDaysChange = { selectedDays = it },
+                habitName = name,
+                onHabitNameChange = viewModel::onNameChange,
+                habitDescription = description,
+                onHabitDescriptionChange = viewModel::onDescriptionChange,
+                selectedDays = frequency,
+                onSelectedDaysChange = { viewModel.toggleFrequencyDay(it) },
                 dailyGoal = dailyGoal,
-                onDailyGoalChange = { dailyGoal = it },
+                onDailyGoalChange = viewModel::onDailyGoalChange,
                 reminders = reminders,
                 timeFormatter = timeFormatter,
                 onAddReminderClick = { showReminderDialog = true },
-                onRemoveReminder = { viewModel.removeReminder(it) },
-                onCreateClick = { navController.popBackStack() }
+                onRemoveReminder = viewModel::removeReminder,
+                onCreateClick = { 
+                    viewModel.saveHabit {
+                        navController.popBackStack()
+                    }
+                }
             )
         } else {
             SinglePaneLayout(
-                habitName = habitName,
-                onHabitNameChange = { habitName = it },
-                habitDescription = habitDescription,
-                onHabitDescriptionChange = { habitDescription = it },
-                selectedDays = selectedDays,
-                onSelectedDaysChange = { selectedDays = it },
+                habitName = name,
+                onHabitNameChange = viewModel::onNameChange,
+                habitDescription = description,
+                onHabitDescriptionChange = viewModel::onDescriptionChange,
+                selectedDays = frequency,
+                onSelectedDaysChange = { viewModel.toggleFrequencyDay(it) },
                 dailyGoal = dailyGoal,
-                onDailyGoalChange = { dailyGoal = it },
+                onDailyGoalChange = viewModel::onDailyGoalChange,
                 reminders = reminders,
                 timeFormatter = timeFormatter,
                 onAddReminderClick = { showReminderDialog = true },
-                onRemoveReminder = { viewModel.removeReminder(it) },
-                onCreateClick = { navController.popBackStack() }
+                onRemoveReminder = viewModel::removeReminder,
+                onCreateClick = { 
+                    viewModel.saveHabit {
+                        navController.popBackStack()
+                    }
+                }
             )
         }
     }
@@ -105,8 +113,8 @@ private fun SinglePaneLayout(
     onHabitNameChange: (String) -> Unit,
     habitDescription: String,
     onHabitDescriptionChange: (String) -> Unit,
-    selectedDays: Set<Int>,
-    onSelectedDaysChange: (Set<Int>) -> Unit,
+    selectedDays: List<Int>,
+    onSelectedDaysChange: (Int) -> Unit,
     dailyGoal: Int,
     onDailyGoalChange: (Int) -> Unit,
     reminders: List<java.time.LocalTime>,
@@ -139,8 +147,8 @@ private fun TwoPaneLayout(
     onHabitNameChange: (String) -> Unit,
     habitDescription: String,
     onHabitDescriptionChange: (String) -> Unit,
-    selectedDays: Set<Int>,
-    onSelectedDaysChange: (Set<Int>) -> Unit,
+    selectedDays: List<Int>,
+    onSelectedDaysChange: (Int) -> Unit,
     dailyGoal: Int,
     onDailyGoalChange: (Int) -> Unit,
     reminders: List<java.time.LocalTime>,
@@ -227,8 +235,8 @@ private fun GeneralInfoCard(
 
 @Composable
 private fun FrequencyCard(
-    selectedDays: Set<Int>,
-    onSelectedDaysChange: (Set<Int>) -> Unit
+    selectedDays: List<Int>,
+    onSelectedDayToggle: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
@@ -252,10 +260,8 @@ private fun FrequencyCard(
                 days.forEachIndexed { index, day ->
                     DayChip(
                         label = day,
-                        isSelected = index in selectedDays,
-                        onClick = {
-                            onSelectedDaysChange(if (index in selectedDays) selectedDays - index else selectedDays + index)
-                        }
+                        isSelected = (index + 1) in selectedDays,
+                        onClick = { onSelectedDayToggle(index + 1) }
                     )
                 }
             }

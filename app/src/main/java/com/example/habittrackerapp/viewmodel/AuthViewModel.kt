@@ -2,15 +2,21 @@ package com.example.habittrackerapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habittrackerapp.data.repository.HabitRepository
+import com.example.habittrackerapp.domain.model.AppSettings
+import com.example.habittrackerapp.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor() : ViewModel() {
+class AuthViewModel @Inject constructor(
+    private val repository: HabitRepository
+) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
@@ -46,16 +52,91 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     fun signInAnonymously(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
-            // Placeholder logic
+            
+            // Simulation of Firebase Auth successful login
+            val userId = UUID.randomUUID().toString()
+            val anonymousUser = User(
+                uid = userId,
+                displayName = "Anonymous User",
+                email = null,
+                photoUrl = null,
+                bio = null,
+                totalPoints = 0,
+                joinedDate = System.currentTimeMillis()
+            )
+            
+            repository.upsertUser(anonymousUser)
+            
+            // Initialize default settings
+            repository.upsertSettings(AppSettings(
+                userId = userId,
+                isDarkMode = false,
+                notificationsEnabled = true,
+                preferredLanguage = "en"
+            ))
+            
             _authState.value = AuthState.Success
             onSuccess()
         }
     }
 
-    fun registerWithEmail(email: String, password: String, username: String, onSuccess: () -> Unit) {
+    fun signInWithEmail(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
-            // Placeholder logic
+            
+            // Simulation of Firebase Auth successful login
+            val userId = UUID.randomUUID().toString()
+            val user = User(
+                uid = userId,
+                displayName = "Logged User",
+                email = _emailField.value,
+                photoUrl = null,
+                bio = null,
+                totalPoints = 0,
+                joinedDate = System.currentTimeMillis()
+            )
+            
+            repository.upsertUser(user)
+            
+            // Initialize default settings if not exists
+            repository.upsertSettings(AppSettings(
+                userId = userId,
+                isDarkMode = false,
+                notificationsEnabled = true,
+                preferredLanguage = "en"
+            ))
+            
+            _authState.value = AuthState.Success
+            onSuccess()
+        }
+    }
+
+    fun registerWithEmail(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            
+            // Simulation of Firebase Auth successful registration
+            val userId = UUID.randomUUID().toString()
+            val newUser = User(
+                uid = userId,
+                displayName = _usernameField.value,
+                email = _emailField.value,
+                photoUrl = null,
+                bio = null,
+                totalPoints = 0,
+                joinedDate = System.currentTimeMillis()
+            )
+            
+            repository.upsertUser(newUser)
+            
+            // Initialize default settings
+            repository.upsertSettings(AppSettings(
+                userId = userId,
+                isDarkMode = false,
+                notificationsEnabled = true,
+                preferredLanguage = "en"
+            ))
+
             _authState.value = AuthState.Success
             onSuccess()
         }

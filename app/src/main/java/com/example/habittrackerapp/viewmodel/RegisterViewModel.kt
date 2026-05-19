@@ -2,15 +2,21 @@ package com.example.habittrackerapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habittrackerapp.data.repository.HabitRepository
+import com.example.habittrackerapp.domain.model.AppSettings
+import com.example.habittrackerapp.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor() : ViewModel() {
+class RegisterViewModel @Inject constructor(
+    private val repository: HabitRepository
+) : ViewModel() {
 
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username.asStateFlow()
@@ -46,17 +52,38 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
         _confirmPassword.value = value
     }
 
+    private suspend fun initializeUser(userId: String, displayName: String, email: String?) {
+        val user = User(
+            uid = userId,
+            displayName = displayName,
+            email = email,
+            photoUrl = null,
+            bio = null,
+            totalPoints = 0,
+            joinedDate = System.currentTimeMillis()
+        )
+        repository.upsertUser(user)
+        repository.upsertSettings(AppSettings(
+            userId = userId,
+            isDarkMode = false,
+            notificationsEnabled = true,
+            preferredLanguage = "en"
+        ))
+    }
+
     fun register(onSuccess: () -> Unit) {
         if (_password.value != _confirmPassword.value) {
-            _errorMessage.value = "Passwords do not match" // This should ideally be a string resource ID in a real app, but for now...
+            _errorMessage.value = "Passwords do not match"
             return
         }
         
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
-            // Simulate API call
-            kotlinx.coroutines.delay(1500)
+            
+            val userId = UUID.randomUUID().toString()
+            initializeUser(userId, _username.value, _email.value)
+            
             _isLoading.value = false
             onSuccess()
         }
@@ -65,8 +92,10 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
     fun registerWithGoogle(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
-            // Simulate Google Login
-            kotlinx.coroutines.delay(1000)
+            
+            val userId = UUID.randomUUID().toString()
+            initializeUser(userId, "Google User", null)
+            
             _isLoading.value = false
             onSuccess()
         }
@@ -75,8 +104,10 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
     fun registerWithFacebook(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
-            // Simulate Facebook Login
-            kotlinx.coroutines.delay(1000)
+            
+            val userId = UUID.randomUUID().toString()
+            initializeUser(userId, "Facebook User", null)
+            
             _isLoading.value = false
             onSuccess()
         }
@@ -85,8 +116,10 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
     fun continueAsGuest(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
-            // Simulate Guest Login
-            kotlinx.coroutines.delay(500)
+            
+            val userId = UUID.randomUUID().toString()
+            initializeUser(userId, "Guest User", null)
+
             _isLoading.value = false
             onSuccess()
         }

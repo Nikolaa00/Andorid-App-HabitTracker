@@ -2,13 +2,15 @@ package com.example.habittrackerapp.data.repository
 
 import com.example.habittrackerapp.data.local.dao.HabitDao
 import com.example.habittrackerapp.data.local.dao.UserDao
-import com.example.habittrackerapp.data.local.entity.AppSettingsEntity
-import com.example.habittrackerapp.data.local.entity.HabitEntity
-import com.example.habittrackerapp.data.local.entity.UserEntity
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.example.habittrackerapp.data.mapper.toDomain
+import com.example.habittrackerapp.data.mapper.toEntity
+import com.example.habittrackerapp.domain.model.AppSettings
+import com.example.habittrackerapp.domain.model.Habit
+import com.example.habittrackerapp.domain.model.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,32 +20,47 @@ class HabitRepository @Inject constructor(
     private val userDao: UserDao
 ) {
     // Habit Operations
-    val allHabits: Flow<List<HabitEntity>> = habitDao.getAllHabits()
+    val allHabits: Flow<List<Habit>> = habitDao.getAllHabits().map { entities ->
+        entities.map { it.toDomain() }
+    }
 
-    suspend fun getHabitById(id: Int): HabitEntity? = habitDao.getHabitById(id)
+    suspend fun getHabitById(id: Int): Habit? = habitDao.getHabitById(id)?.toDomain()
 
-    suspend fun insertHabit(habit: HabitEntity) = habitDao.insertHabit(habit)
+    suspend fun insertHabit(habit: Habit) = habitDao.insertHabit(habit.toEntity())
 
-    suspend fun updateHabit(habit: HabitEntity) = habitDao.updateHabit(habit)
+    suspend fun updateHabit(habit: Habit) = habitDao.updateHabit(habit.toEntity())
 
-    suspend fun deleteHabit(habit: HabitEntity) = habitDao.deleteHabit(habit)
+    suspend fun deleteHabit(habit: Habit) = habitDao.deleteHabit(habit.toEntity())
 
     suspend fun deleteAllHabits() = habitDao.deleteAllHabits()
 
     // User & Session Operations
-    private val _userSession = MutableStateFlow<UserEntity?>(null)
-    val userSession: StateFlow<UserEntity?> = _userSession.asStateFlow()
+    private val _userSession = MutableStateFlow<User?>(null)
+    val userSession: StateFlow<User?> = _userSession.asStateFlow()
 
-    fun getUser(uid: String): Flow<UserEntity?> = userDao.getUserById(uid)
+    private val _isSessionLoaded = MutableStateFlow(false)
+    val isSessionLoaded: StateFlow<Boolean> = _isSessionLoaded.asStateFlow()
 
-    suspend fun upsertUser(user: UserEntity) {
-        userDao.upsertUser(user)
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            val lastUser = userDao.getAllUsers().first().firstOrNull()
+            _userSession.value = lastUser?.toDomain()
+            _isSessionLoaded.value = true
+        }
+    }
+
+    fun getUser(uid: String): Flow<User?> = userDao.getUserById(uid).map { it?.toDomain() }
+
+    suspend fun upsertUser(user: User) {
+        userDao.upsertUser(user.toEntity())
         _userSession.value = user
     }
 
-    fun getSettings(userId: String): Flow<AppSettingsEntity?> = userDao.getSettingsByUserId(userId)
+    fun getSettings(userId: String): Flow<AppSettings?> = 
+        userDao.getSettingsByUserId(userId).map { it?.toDomain() }
 
-    suspend fun upsertSettings(settings: AppSettingsEntity) = userDao.upsertSettings(settings)
+    suspend fun upsertSettings(settings: AppSettings) = 
+        userDao.upsertSettings(settings.toEntity())
 
     suspend fun clearSession() {
         _userSession.value = null
