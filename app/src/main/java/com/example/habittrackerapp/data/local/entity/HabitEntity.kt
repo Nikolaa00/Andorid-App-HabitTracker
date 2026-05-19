@@ -2,6 +2,7 @@ package com.example.habittrackerapp.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.LocalTime
 
 @Entity(tableName = "habits")
 data class HabitEntity(
@@ -9,8 +10,9 @@ data class HabitEntity(
     val id: Int = 0,
     val name: String,
     val description: String,
-    val frequencyDays: Int, // e.g., 7 for every day, 1 for once a week (or custom logic)
-    val dailyGoalCount: Int,
-    val completedCount: Int,
-    val lastUpdatedTimestamp: Long
+    val frequency: List<Int>, // e.g., List of days of the week (1-7)
+    val dailyGoal: Int,
+    val currentProgress: Int,
+    val reminders: List<LocalTime>,
+    val lastUpdated: Long
 )
