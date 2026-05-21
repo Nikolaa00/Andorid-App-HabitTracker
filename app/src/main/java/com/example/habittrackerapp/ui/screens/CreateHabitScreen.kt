@@ -56,7 +56,8 @@ fun CreateHabitScreen(
         )
     }
 
-    val isExpanded = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Expanded
+    // Fix: Only trigger expanded layout for tablets/desktops (Expanded width)
+    val isExpanded = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
 
     Box(
         modifier = Modifier
@@ -127,17 +128,19 @@ private fun SinglePaneLayout(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // Vertical Order: General Info -> Frequency -> Daily Goal -> Reminders -> Button
         GeneralInfoCard(habitName, onHabitNameChange, habitDescription, onHabitDescriptionChange)
-        Spacer(modifier = Modifier.height(16.dp))
         FrequencyCard(selectedDays, onSelectedDaysChange)
-        Spacer(modifier = Modifier.height(16.dp))
         DailyGoalCard(dailyGoal, onDailyGoalChange)
-        Spacer(modifier = Modifier.height(16.dp))
         RemindersCard(reminders, timeFormatter, onAddReminderClick, onRemoveReminder)
-        Spacer(modifier = Modifier.height(24.dp))
+        
+        Spacer(modifier = Modifier.height(8.dp))
         CreateButton(onCreateClick)
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -166,23 +169,21 @@ private fun TwoPaneLayout(
     ) {
         // Left Column
         Column(
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             GeneralInfoCard(habitName, onHabitNameChange, habitDescription, onHabitDescriptionChange)
-            Spacer(modifier = Modifier.height(16.dp))
             FrequencyCard(selectedDays, onSelectedDaysChange)
         }
 
         // Right Column
         Column(
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             DailyGoalCard(dailyGoal, onDailyGoalChange)
-            Spacer(modifier = Modifier.height(16.dp))
             RemindersCard(reminders, timeFormatter, onAddReminderClick, onRemoveReminder)
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             CreateButton(onCreateClick)
         }
     }
@@ -208,7 +209,7 @@ private fun GeneralInfoCard(
             }
             Spacer(modifier = Modifier.height(16.dp))
             
-            Text(text = stringResource(R.string.label_habit_name), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.label_habit_name).uppercase(), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.ExtraBold)
             OutlinedTextField(
                 value = habitName,
                 onValueChange = onHabitNameChange,
@@ -220,7 +221,7 @@ private fun GeneralInfoCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = stringResource(R.string.label_habit_desc), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.label_habit_desc).uppercase(), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.ExtraBold)
             OutlinedTextField(
                 value = habitDescription,
                 onValueChange = onHabitDescriptionChange,
@@ -290,19 +291,34 @@ private fun DailyGoalCard(
             Spacer(modifier = Modifier.height(16.dp))
             
             Row(
-                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFFF1F5F9)).padding(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFFF1F5F9))
+                    .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Center
             ) {
-                IconButton(onClick = { if (dailyGoal > 1) onDailyGoalChange(dailyGoal - 1) }, modifier = Modifier.background(Color.White, CircleShape)) {
-                    Icon(Icons.Default.Remove, contentDescription = null)
+                IconButton(
+                    onClick = { if (dailyGoal > 1) onDailyGoalChange(dailyGoal - 1) }, 
+                    modifier = Modifier.background(Color.White, CircleShape).size(48.dp)
+                ) {
+                    Icon(Icons.Default.Remove, contentDescription = null, tint = Color.Black)
                 }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = dailyGoal.toString(), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                    Text(text = stringResource(R.string.counter_times_per_day), fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                
+                Column(
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = dailyGoal.toString(), fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                    Text(text = stringResource(R.string.counter_times_per_day), fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.ExtraBold)
                 }
-                IconButton(onClick = { onDailyGoalChange(dailyGoal + 1) }, modifier = Modifier.background(Color.White, CircleShape)) {
-                    Icon(Icons.Default.Add, contentDescription = null)
+                
+                IconButton(
+                    onClick = { onDailyGoalChange(dailyGoal + 1) }, 
+                    modifier = Modifier.background(Color.White, CircleShape).size(48.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null, tint = Color.Black)
                 }
             }
         }
@@ -332,7 +348,6 @@ private fun RemindersCard(
             Text(text = stringResource(R.string.reminders_description), fontSize = 14.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Reminders List
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -365,18 +380,17 @@ private fun RemindersCard(
                     }
                 }
 
-                // Add Button
                 IconButton(
                     onClick = onAddReminderClick,
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(40.dp)
                         .background(Color(0xFFE3F2FD), CircleShape)
                 ) {
                     Icon(
                         Icons.Default.Add,
                         contentDescription = null,
                         tint = Color(0xFF1A73E8),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
