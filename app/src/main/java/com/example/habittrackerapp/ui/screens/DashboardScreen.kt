@@ -42,6 +42,9 @@ fun DashboardScreen(
     val horizontalPadding = if (isPhoneLandscape) 32.dp else 16.dp
     val spacing = if (isPhoneLandscape) 8.dp else 16.dp
 
+    val doneCount = habits.count { it.currentProgress >= it.dailyGoal }
+    val totalCount = habits.size
+    
     val totalGoals = habits.sumOf { it.dailyGoal }
     val totalProgress = habits.sumOf { it.currentProgress }
     val progressFraction = if (totalGoals > 0) totalProgress.toFloat() / totalGoals.toFloat() else 0f
@@ -96,7 +99,7 @@ fun DashboardScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = stringResource(R.string.progress_subtext),
+                        text = stringResource(R.string.progress_subtext, doneCount, totalCount),
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
@@ -127,15 +130,12 @@ fun DashboardScreen(
                     fontWeight = FontWeight.Bold
                 )
                 
-                val doneHabitsCount = habits.count { it.currentProgress >= it.dailyGoal }
-                val totalHabitsCount = habits.size
-                
                 Surface(
                     color = Color(0xFFF1F5F9),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = "$doneHabitsCount/$totalHabitsCount ${stringResource(R.string.done_badge)}",
+                        text = "$doneCount/$totalCount ${stringResource(R.string.done_badge)}",
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
