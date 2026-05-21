@@ -39,7 +39,6 @@ fun CreateHabitScreen(
 ) {
     val name by viewModel.name.collectAsState()
     val description by viewModel.description.collectAsState()
-    val dailyGoal by viewModel.dailyGoal.collectAsState()
     val frequency by viewModel.frequency.collectAsState()
     val reminders by viewModel.reminders.collectAsState()
 
@@ -56,7 +55,6 @@ fun CreateHabitScreen(
         )
     }
 
-    // Fix: Only trigger expanded layout for tablets/desktops (Expanded width)
     val isExpanded = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
 
     Box(
@@ -72,8 +70,6 @@ fun CreateHabitScreen(
                 onHabitDescriptionChange = viewModel::onDescriptionChange,
                 selectedDays = frequency,
                 onSelectedDaysChange = { viewModel.toggleFrequencyDay(it) },
-                dailyGoal = dailyGoal,
-                onDailyGoalChange = viewModel::onDailyGoalChange,
                 reminders = reminders,
                 timeFormatter = timeFormatter,
                 onAddReminderClick = { showReminderDialog = true },
@@ -92,8 +88,6 @@ fun CreateHabitScreen(
                 onHabitDescriptionChange = viewModel::onDescriptionChange,
                 selectedDays = frequency,
                 onSelectedDaysChange = { viewModel.toggleFrequencyDay(it) },
-                dailyGoal = dailyGoal,
-                onDailyGoalChange = viewModel::onDailyGoalChange,
                 reminders = reminders,
                 timeFormatter = timeFormatter,
                 onAddReminderClick = { showReminderDialog = true },
@@ -116,8 +110,6 @@ private fun SinglePaneLayout(
     onHabitDescriptionChange: (String) -> Unit,
     selectedDays: List<Int>,
     onSelectedDaysChange: (Int) -> Unit,
-    dailyGoal: Int,
-    onDailyGoalChange: (Int) -> Unit,
     reminders: List<java.time.LocalTime>,
     timeFormatter: DateTimeFormatter,
     onAddReminderClick: () -> Unit,
@@ -132,10 +124,8 @@ private fun SinglePaneLayout(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Vertical Order: General Info -> Frequency -> Daily Goal -> Reminders -> Button
         GeneralInfoCard(habitName, onHabitNameChange, habitDescription, onHabitDescriptionChange)
         FrequencyCard(selectedDays, onSelectedDaysChange)
-        DailyGoalCard(dailyGoal, onDailyGoalChange)
         RemindersCard(reminders, timeFormatter, onAddReminderClick, onRemoveReminder)
         
         Spacer(modifier = Modifier.height(8.dp))
@@ -152,8 +142,6 @@ private fun TwoPaneLayout(
     onHabitDescriptionChange: (String) -> Unit,
     selectedDays: List<Int>,
     onSelectedDaysChange: (Int) -> Unit,
-    dailyGoal: Int,
-    onDailyGoalChange: (Int) -> Unit,
     reminders: List<java.time.LocalTime>,
     timeFormatter: DateTimeFormatter,
     onAddReminderClick: () -> Unit,
@@ -181,7 +169,6 @@ private fun TwoPaneLayout(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            DailyGoalCard(dailyGoal, onDailyGoalChange)
             RemindersCard(reminders, timeFormatter, onAddReminderClick, onRemoveReminder)
             Spacer(modifier = Modifier.height(8.dp))
             CreateButton(onCreateClick)
@@ -268,59 +255,6 @@ private fun FrequencyCard(
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = stringResource(R.string.frequency_subtext), fontSize = 14.sp, color = Color.Gray)
-        }
-    }
-}
-
-@Composable
-private fun DailyGoalCard(
-    dailyGoal: Int,
-    onDailyGoalChange: (Int) -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.TrackChanges, contentDescription = null, tint = EmeraldGreen)
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(text = stringResource(R.string.header_goal), fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFF1F5F9))
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                IconButton(
-                    onClick = { if (dailyGoal > 1) onDailyGoalChange(dailyGoal - 1) }, 
-                    modifier = Modifier.background(Color.White, CircleShape).size(48.dp)
-                ) {
-                    Icon(Icons.Default.Remove, contentDescription = null, tint = Color.Black)
-                }
-                
-                Column(
-                    modifier = Modifier.padding(horizontal = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = dailyGoal.toString(), fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                    Text(text = stringResource(R.string.counter_times_per_day), fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.ExtraBold)
-                }
-                
-                IconButton(
-                    onClick = { onDailyGoalChange(dailyGoal + 1) }, 
-                    modifier = Modifier.background(Color.White, CircleShape).size(48.dp)
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = null, tint = Color.Black)
-                }
-            }
         }
     }
 }

@@ -23,6 +23,7 @@ class CreateHabitViewModel @Inject constructor(
     private val _description = MutableStateFlow("")
     val description: StateFlow<String> = _description.asStateFlow()
 
+    // Default daily goal set to 1, user UI removed
     private val _dailyGoal = MutableStateFlow(1)
     val dailyGoal: StateFlow<Int> = _dailyGoal.asStateFlow()
 
@@ -34,7 +35,6 @@ class CreateHabitViewModel @Inject constructor(
 
     fun onNameChange(value: String) { _name.value = value }
     fun onDescriptionChange(value: String) { _description.value = value }
-    fun onDailyGoalChange(value: Int) { _dailyGoal.value = value }
     
     fun toggleFrequencyDay(day: Int) {
         if (_frequency.value.contains(day)) {
@@ -62,7 +62,7 @@ class CreateHabitViewModel @Inject constructor(
                 name = _name.value,
                 description = _description.value,
                 frequency = _frequency.value,
-                dailyGoal = _dailyGoal.value,
+                dailyGoal = _dailyGoal.value, // Still uses the default value 1
                 currentProgress = 0,
                 reminders = _reminders.value,
                 lastUpdated = System.currentTimeMillis()

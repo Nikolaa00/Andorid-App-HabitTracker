@@ -28,7 +28,7 @@
     <string name="already_have_account">Already have an account? </string>
 
     <string name="greeting_user">Hello, User!</string>
-    <string name="streak_info">You\'re on a 12-day streak. Keep it up!</string>
+    <string name="streak_info">Keep it up!</string>
     <string name="daily_progress">Daily Progress</string>
     <string name="progress_subtext">You\'ve completed %1$d out of %2$d habits today. Keep it up!</string>
     <string name="todays_habits">Today\'s Habits</string>
