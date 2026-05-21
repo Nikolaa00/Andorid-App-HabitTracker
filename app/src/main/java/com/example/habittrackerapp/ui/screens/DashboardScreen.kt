@@ -126,12 +126,16 @@ fun DashboardScreen(
                     fontSize = if (isPhoneLandscape) 18.sp else 20.sp,
                     fontWeight = FontWeight.Bold
                 )
+                
+                val doneHabitsCount = habits.count { it.currentProgress >= it.dailyGoal }
+                val totalHabitsCount = habits.size
+                
                 Surface(
                     color = Color(0xFFF1F5F9),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = "${habits.count { it.currentProgress >= it.dailyGoal }} " + stringResource(R.string.done_badge),
+                        text = "$doneHabitsCount/$totalHabitsCount ${stringResource(R.string.done_badge)}",
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
