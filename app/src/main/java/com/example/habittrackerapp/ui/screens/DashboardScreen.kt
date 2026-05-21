@@ -174,7 +174,7 @@ fun HabitItem(habit: Habit, onToggleComplete: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = habit.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Text(
-                    text = "${habit.currentProgress} / ${habit.dailyGoal}", 
+                    text = if (habit.description.isNotBlank()) habit.description else "${habit.currentProgress} / ${habit.dailyGoal}",
                     fontSize = 14.sp, 
                     color = Color.Gray
                 )
