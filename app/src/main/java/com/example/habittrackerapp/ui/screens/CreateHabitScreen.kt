@@ -37,12 +37,11 @@ fun CreateHabitScreen(
     windowSizeClass: WindowSizeClass,
     viewModel: CreateHabitViewModel = hiltViewModel()
 ) {
-    var habitName by remember { mutableStateOf("") }
-    var habitDescription by remember { mutableStateOf("") }
-    var selectedDays by remember { mutableStateOf(setOf(0, 1, 2, 3, 4)) }
-    var dailyGoal by remember { mutableIntStateOf(8) }
-
+    val name by viewModel.name.collectAsState()
+    val description by viewModel.description.collectAsState()
+    val frequency by viewModel.frequency.collectAsState()
     val reminders by viewModel.reminders.collectAsState()
+
     var showReminderDialog by remember { mutableStateOf(false) }
     val timeFormatter = remember { DateTimeFormatter.ofPattern("hh:mm a") }
 
@@ -56,7 +55,7 @@ fun CreateHabitScreen(
         )
     }
 
-    val isExpanded = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+    val isExpanded = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
 
     Box(
         modifier = Modifier
@@ -65,35 +64,39 @@ fun CreateHabitScreen(
     ) {
         if (isExpanded) {
             TwoPaneLayout(
-                habitName = habitName,
-                onHabitNameChange = { habitName = it },
-                habitDescription = habitDescription,
-                onHabitDescriptionChange = { habitDescription = it },
-                selectedDays = selectedDays,
-                onSelectedDaysChange = { selectedDays = it },
-                dailyGoal = dailyGoal,
-                onDailyGoalChange = { dailyGoal = it },
+                habitName = name,
+                onHabitNameChange = viewModel::onNameChange,
+                habitDescription = description,
+                onHabitDescriptionChange = viewModel::onDescriptionChange,
+                selectedDays = frequency,
+                onSelectedDaysChange = { viewModel.toggleFrequencyDay(it) },
                 reminders = reminders,
                 timeFormatter = timeFormatter,
                 onAddReminderClick = { showReminderDialog = true },
-                onRemoveReminder = { viewModel.removeReminder(it) },
-                onCreateClick = { navController.popBackStack() }
+                onRemoveReminder = viewModel::removeReminder,
+                onCreateClick = { 
+                    viewModel.saveHabit {
+                        navController.popBackStack()
+                    }
+                }
             )
         } else {
             SinglePaneLayout(
-                habitName = habitName,
-                onHabitNameChange = { habitName = it },
-                habitDescription = habitDescription,
-                onHabitDescriptionChange = { habitDescription = it },
-                selectedDays = selectedDays,
-                onSelectedDaysChange = { selectedDays = it },
-                dailyGoal = dailyGoal,
-                onDailyGoalChange = { dailyGoal = it },
+                habitName = name,
+                onHabitNameChange = viewModel::onNameChange,
+                habitDescription = description,
+                onHabitDescriptionChange = viewModel::onDescriptionChange,
+                selectedDays = frequency,
+                onSelectedDaysChange = { viewModel.toggleFrequencyDay(it) },
                 reminders = reminders,
                 timeFormatter = timeFormatter,
                 onAddReminderClick = { showReminderDialog = true },
-                onRemoveReminder = { viewModel.removeReminder(it) },
-                onCreateClick = { navController.popBackStack() }
+                onRemoveReminder = viewModel::removeReminder,
+                onCreateClick = { 
+                    viewModel.saveHabit {
+                        navController.popBackStack()
+                    }
+                }
             )
         }
     }
@@ -105,10 +108,8 @@ private fun SinglePaneLayout(
     onHabitNameChange: (String) -> Unit,
     habitDescription: String,
     onHabitDescriptionChange: (String) -> Unit,
-    selectedDays: Set<Int>,
-    onSelectedDaysChange: (Set<Int>) -> Unit,
-    dailyGoal: Int,
-    onDailyGoalChange: (Int) -> Unit,
+    selectedDays: List<Int>,
+    onSelectedDaysChange: (Int) -> Unit,
     reminders: List<java.time.LocalTime>,
     timeFormatter: DateTimeFormatter,
     onAddReminderClick: () -> Unit,
@@ -119,17 +120,17 @@ private fun SinglePaneLayout(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         GeneralInfoCard(habitName, onHabitNameChange, habitDescription, onHabitDescriptionChange)
-        Spacer(modifier = Modifier.height(16.dp))
         FrequencyCard(selectedDays, onSelectedDaysChange)
-        Spacer(modifier = Modifier.height(16.dp))
-        DailyGoalCard(dailyGoal, onDailyGoalChange)
-        Spacer(modifier = Modifier.height(16.dp))
         RemindersCard(reminders, timeFormatter, onAddReminderClick, onRemoveReminder)
-        Spacer(modifier = Modifier.height(24.dp))
+        
+        Spacer(modifier = Modifier.height(8.dp))
         CreateButton(onCreateClick)
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -139,10 +140,8 @@ private fun TwoPaneLayout(
     onHabitNameChange: (String) -> Unit,
     habitDescription: String,
     onHabitDescriptionChange: (String) -> Unit,
-    selectedDays: Set<Int>,
-    onSelectedDaysChange: (Set<Int>) -> Unit,
-    dailyGoal: Int,
-    onDailyGoalChange: (Int) -> Unit,
+    selectedDays: List<Int>,
+    onSelectedDaysChange: (Int) -> Unit,
     reminders: List<java.time.LocalTime>,
     timeFormatter: DateTimeFormatter,
     onAddReminderClick: () -> Unit,
@@ -158,23 +157,20 @@ private fun TwoPaneLayout(
     ) {
         // Left Column
         Column(
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             GeneralInfoCard(habitName, onHabitNameChange, habitDescription, onHabitDescriptionChange)
-            Spacer(modifier = Modifier.height(16.dp))
             FrequencyCard(selectedDays, onSelectedDaysChange)
         }
 
         // Right Column
         Column(
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            DailyGoalCard(dailyGoal, onDailyGoalChange)
-            Spacer(modifier = Modifier.height(16.dp))
             RemindersCard(reminders, timeFormatter, onAddReminderClick, onRemoveReminder)
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             CreateButton(onCreateClick)
         }
     }
@@ -200,7 +196,7 @@ private fun GeneralInfoCard(
             }
             Spacer(modifier = Modifier.height(16.dp))
             
-            Text(text = stringResource(R.string.label_habit_name), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.label_habit_name).uppercase(), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.ExtraBold)
             OutlinedTextField(
                 value = habitName,
                 onValueChange = onHabitNameChange,
@@ -212,7 +208,7 @@ private fun GeneralInfoCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = stringResource(R.string.label_habit_desc), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.label_habit_desc).uppercase(), fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.ExtraBold)
             OutlinedTextField(
                 value = habitDescription,
                 onValueChange = onHabitDescriptionChange,
@@ -227,8 +223,8 @@ private fun GeneralInfoCard(
 
 @Composable
 private fun FrequencyCard(
-    selectedDays: Set<Int>,
-    onSelectedDaysChange: (Set<Int>) -> Unit
+    selectedDays: List<Int>,
+    onSelectedDayToggle: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
@@ -252,53 +248,13 @@ private fun FrequencyCard(
                 days.forEachIndexed { index, day ->
                     DayChip(
                         label = day,
-                        isSelected = index in selectedDays,
-                        onClick = {
-                            onSelectedDaysChange(if (index in selectedDays) selectedDays - index else selectedDays + index)
-                        }
+                        isSelected = (index + 1) in selectedDays,
+                        onClick = { onSelectedDayToggle(index + 1) }
                     )
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = stringResource(R.string.frequency_subtext), fontSize = 14.sp, color = Color.Gray)
-        }
-    }
-}
-
-@Composable
-private fun DailyGoalCard(
-    dailyGoal: Int,
-    onDailyGoalChange: (Int) -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth().border(1.dp, LightGrayBorder, RoundedCornerShape(24.dp)),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.TrackChanges, contentDescription = null, tint = EmeraldGreen)
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(text = stringResource(R.string.header_goal), fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0xFFF1F5F9)).padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(onClick = { if (dailyGoal > 1) onDailyGoalChange(dailyGoal - 1) }, modifier = Modifier.background(Color.White, CircleShape)) {
-                    Icon(Icons.Default.Remove, contentDescription = null)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = dailyGoal.toString(), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                    Text(text = stringResource(R.string.counter_times_per_day), fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                }
-                IconButton(onClick = { onDailyGoalChange(dailyGoal + 1) }, modifier = Modifier.background(Color.White, CircleShape)) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                }
-            }
         }
     }
 }
@@ -326,7 +282,6 @@ private fun RemindersCard(
             Text(text = stringResource(R.string.reminders_description), fontSize = 14.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Reminders List
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -359,18 +314,17 @@ private fun RemindersCard(
                     }
                 }
 
-                // Add Button
                 IconButton(
                     onClick = onAddReminderClick,
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(40.dp)
                         .background(Color(0xFFE3F2FD), CircleShape)
                 ) {
                     Icon(
                         Icons.Default.Add,
                         contentDescription = null,
                         tint = Color(0xFF1A73E8),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }

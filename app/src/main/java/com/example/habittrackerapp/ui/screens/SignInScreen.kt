@@ -25,19 +25,22 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.habittrackerapp.R
 import com.example.habittrackerapp.navigation.Screen
 import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
+import com.example.habittrackerapp.viewmodel.AuthViewModel
 
 @Composable
 fun SignInScreen(
     navController: NavController,
-    windowSizeClass: WindowSizeClass
+    windowSizeClass: WindowSizeClass,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val email by viewModel.emailField.collectAsState()
+    val password by viewModel.passwordField.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
 
     val isLargeScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
@@ -137,7 +140,7 @@ fun SignInScreen(
                         )
                         OutlinedTextField(
                             value = email,
-                            onValueChange = { email = it },
+                            onValueChange = viewModel::onEmailChange,
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = { Text(stringResource(R.string.email_hint)) },
                             shape = RoundedCornerShape(12.dp),
@@ -157,7 +160,7 @@ fun SignInScreen(
                         )
                         OutlinedTextField(
                             value = password,
-                            onValueChange = { password = it },
+                            onValueChange = viewModel::onPasswordChange,
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = { Text("••••••••") },
                             shape = RoundedCornerShape(12.dp),
@@ -179,7 +182,13 @@ fun SignInScreen(
                         Spacer(modifier = Modifier.height(if (isPhoneLandscape) 12.dp else 24.dp))
 
                         Button(
-                            onClick = { navController.navigate(Screen.Home.route) },
+                            onClick = { 
+                                viewModel.signInWithEmail {
+                                    navController.navigate(Screen.Home.route) {
+                                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                                    }
+                                }
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),

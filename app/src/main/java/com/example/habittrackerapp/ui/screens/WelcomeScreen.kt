@@ -20,16 +20,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.habittrackerapp.R
 import com.example.habittrackerapp.navigation.Screen
 import com.example.habittrackerapp.ui.theme.DeepSlateBlue
 import com.example.habittrackerapp.ui.theme.EmeraldGreen
+import com.example.habittrackerapp.viewmodel.AuthViewModel
 
 @Composable
 fun WelcomeScreen(
     navController: NavController,
-    windowSizeClass: WindowSizeClass
+    windowSizeClass: WindowSizeClass,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
     val isLargeScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
     val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
@@ -126,7 +129,13 @@ fun WelcomeScreen(
             Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 16.dp))
 
             OutlinedButton(
-                onClick = { navController.navigate(Screen.Home.route) },
+                onClick = { 
+                    viewModel.signInAnonymously {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Welcome.route) { inclusive = true }
+                        }
+                    }
+                },
                 modifier = buttonModifier.height(56.dp),
                 shape = RoundedCornerShape(28.dp),
                 border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)

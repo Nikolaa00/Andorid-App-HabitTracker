@@ -28,11 +28,11 @@
     <string name="already_have_account">Веќе имате сметка? </string>
 
     <string name="greeting_user">Здраво, Кориснику!</string>
-    <string name="streak_info">Имаш 12-дневен серијал. Продолжи така!</string>
+    <string name="streak_info">Продолжи така!</string>
     <string name="daily_progress">Дневен Напредок</string>
-    <string name="progress_subtext">Денес заврши 4 од 6 навики. Продолжи така!</string>
+    <string name="progress_subtext">Денес заврши %1$d од %2$d навики. Продолжи така!</string>
     <string name="todays_habits">Денешни Навики</string>
-    <string name="done_badge">4/6 Завршено</string>
+    <string name="done_badge">Завршено</string>
     <string name="habit_hydration">Цел за хидратација</string>
     <string name="habit_mindfulness">Свесност</string>
     <string name="habit_walk">Вечерна прошетка</string>

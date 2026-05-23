@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.habittrackerapp.data.local.HabitDatabase
 import com.example.habittrackerapp.data.local.dao.HabitDao
-import com.example.habittrackerapp.data.repository.HabitRepository
+import com.example.habittrackerapp.data.local.dao.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +23,8 @@ object AppModule {
             context,
             HabitDatabase::class.java,
             HabitDatabase.DATABASE_NAME
-        ).build()
+        ).fallbackToDestructiveMigration()
+        .build()
     }
 
     @Provides
@@ -34,7 +35,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideHabitRepository(dao: HabitDao): HabitRepository {
-        return HabitRepository(dao)
+    fun provideUserDao(db: HabitDatabase): UserDao {
+        return db.userDao
     }
 }

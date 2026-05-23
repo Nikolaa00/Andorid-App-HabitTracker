@@ -28,11 +28,11 @@
     <string name="already_have_account">Already have an account? </string>
 
     <string name="greeting_user">Hello, User!</string>
-    <string name="streak_info">You\'re on a 12-day streak. Keep it up!</string>
+    <string name="streak_info">Keep it up!</string>
     <string name="daily_progress">Daily Progress</string>
-    <string name="progress_subtext">You\'ve completed 4 out of 6 habits today. Keep it up!</string>
+    <string name="progress_subtext">You\'ve completed %1$d out of %2$d habits today. Keep it up!</string>
     <string name="todays_habits">Today\'s Habits</string>
-    <string name="done_badge">4/6 Done</string>
+    <string name="done_badge">Done</string>
     <string name="habit_hydration">Hydration Goal</string>
     <string name="habit_mindfulness">Mindfulness</string>
     <string name="habit_walk">Evening Walk</string>

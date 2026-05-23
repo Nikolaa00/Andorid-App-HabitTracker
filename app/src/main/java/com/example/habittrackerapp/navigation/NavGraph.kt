@@ -12,11 +12,12 @@ import com.example.habittrackerapp.viewmodel.RegisterViewModel
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
-    windowSizeClass: WindowSizeClass
+    windowSizeClass: WindowSizeClass,
+    startDestination: String
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Splash.route
+        startDestination = startDestination
     ) {
         composable(route = Screen.Splash.route) {
             SplashScreen(navController = navController)
@@ -34,7 +35,7 @@ fun SetupNavGraph(
             )
         }
         composable(route = Screen.Register.route) {
-            val viewModel: RegisterViewModel = hiltViewModel() // ✅ safe here
+            val viewModel: RegisterViewModel = hiltViewModel()
             RegisterScreen(
                 navController = navController,
                 windowSizeClass = windowSizeClass,
