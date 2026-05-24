@@ -11,7 +11,7 @@ fun UserEntity.toDomain(): User {
         photoUrl = photoUrl,
         bio = bio,
         totalPoints = totalPoints,
-        joinedDate = joinedDate
+        createdAt = createdAt
     )
 }
 
@@ -23,6 +23,6 @@ fun User.toEntity(): UserEntity {
         photoUrl = photoUrl,
         bio = bio,
         totalPoints = totalPoints,
-        joinedDate = joinedDate
+        createdAt = createdAt
     )
 }

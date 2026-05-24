@@ -12,5 +12,5 @@ data class UserEntity(
     val photoUrl: String?,
     val bio: String?,
     val totalPoints: Int,
-    val joinedDate: Long
+    val createdAt: String
 )

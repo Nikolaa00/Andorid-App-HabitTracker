@@ -10,5 +10,6 @@ data class Habit(
     val dailyGoal: Int,
     val currentProgress: Int,
     val reminders: List<LocalTime>,
-    val lastUpdated: Long
+    val lastUpdated: Long,
+    val createdAt: String
 )

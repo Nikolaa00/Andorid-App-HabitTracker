@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 import javax.inject.Inject
 
@@ -76,7 +78,7 @@ class AuthViewModel @Inject constructor(
                             photoUrl = null,
                             bio = null,
                             totalPoints = 0,
-                            joinedDate = System.currentTimeMillis()
+                            createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                         )
                         
                         repository.upsertUser(anonymousUser)
@@ -115,7 +117,7 @@ class AuthViewModel @Inject constructor(
                 photoUrl = null,
                 bio = null,
                 totalPoints = 0,
-                joinedDate = System.currentTimeMillis()
+                createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
             )
             
             repository.upsertUser(user)
@@ -147,7 +149,7 @@ class AuthViewModel @Inject constructor(
                 photoUrl = null,
                 bio = null,
                 totalPoints = 0,
-                joinedDate = System.currentTimeMillis()
+                createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
             )
             
             repository.upsertUser(newUser)

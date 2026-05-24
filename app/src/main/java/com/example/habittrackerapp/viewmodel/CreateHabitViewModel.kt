@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.time.LocalTime
 import javax.inject.Inject
 
@@ -65,7 +67,8 @@ class CreateHabitViewModel @Inject constructor(
                 dailyGoal = _dailyGoal.value, // Still uses the default value 1
                 currentProgress = 0,
                 reminders = _reminders.value,
-                lastUpdated = System.currentTimeMillis()
+                lastUpdated = System.currentTimeMillis(),
+                createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
             )
             repository.insertHabit(newHabit)
             onSuccess()
