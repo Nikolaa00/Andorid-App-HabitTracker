@@ -2,6 +2,7 @@ package com.example.habittrackerapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habittrackerapp.data.repository.AuthRepository
 import com.example.habittrackerapp.data.repository.HabitRepository
 import com.example.habittrackerapp.domain.model.AppSettings
 import com.example.habittrackerapp.domain.model.User
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
     private val repository: HabitRepository
 ) : ViewModel() {
 
@@ -53,30 +55,40 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             
-            // Simulation of Firebase Auth successful login
-            val userId = UUID.randomUUID().toString()
-            val anonymousUser = User(
-                uid = userId,
-                displayName = "Anonymous User",
-                email = null,
-                photoUrl = null,
-                bio = null,
-                totalPoints = 0,
-                joinedDate = System.currentTimeMillis()
-            )
-            
-            repository.upsertUser(anonymousUser)
-            
-            // Initialize default settings
-            repository.upsertSettings(AppSettings(
-                userId = userId,
-                isDarkMode = false,
-                notificationsEnabled = true,
-                preferredLanguage = "en"
-            ))
-            
-            _authState.value = AuthState.Success
-            onSuccess()
+            authRepository.signInAnonymously()
+                .onSuccess { authResult ->
+                    val firebaseUser = authResult.user
+                    if (firebaseUser != null) {
+                        val userId = firebaseUser.uid
+                        val anonymousUser = User(
+                            uid = userId,
+                            displayName = "Anonymous User",
+                            email = null,
+                            photoUrl = null,
+                            bio = null,
+                            totalPoints = 0,
+                            joinedDate = System.currentTimeMillis()
+                        )
+                        
+                        repository.upsertUser(anonymousUser)
+                        
+                        // Initialize default settings
+                        repository.upsertSettings(AppSettings(
+                            userId = userId,
+                            isDarkMode = false,
+                            notificationsEnabled = true,
+                            preferredLanguage = "en"
+                        ))
+                        
+                        _authState.value = AuthState.Success
+                        onSuccess()
+                    } else {
+                        _authState.value = AuthState.Error("Firebase user is null")
+                    }
+                }
+                .onFailure { exception ->
+                    _authState.value = AuthState.Error(exception.message ?: "Anonymous sign-in failed")
+                }
         }
     }
 
