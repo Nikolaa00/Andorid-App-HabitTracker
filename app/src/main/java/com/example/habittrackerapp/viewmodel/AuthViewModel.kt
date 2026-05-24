@@ -51,6 +51,15 @@ class AuthViewModel @Inject constructor(
         _confirmPasswordField.value = value
     }
 
+    fun clearError() {
+        _authState.value = AuthState.Idle
+    }
+
+    fun logout(onSuccess: () -> Unit) {
+        authRepository.logout()
+        onSuccess()
+    }
+
     fun signInAnonymously(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
@@ -97,6 +106,7 @@ class AuthViewModel @Inject constructor(
             _authState.value = AuthState.Loading
             
             // Simulation of Firebase Auth successful login
+            // Will be replaced in Part 3
             val userId = UUID.randomUUID().toString()
             val user = User(
                 uid = userId,
@@ -128,6 +138,7 @@ class AuthViewModel @Inject constructor(
             _authState.value = AuthState.Loading
             
             // Simulation of Firebase Auth successful registration
+            // Will be replaced in Part 3
             val userId = UUID.randomUUID().toString()
             val newUser = User(
                 uid = userId,

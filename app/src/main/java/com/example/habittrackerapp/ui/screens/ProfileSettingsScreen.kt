@@ -20,16 +20,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.habittrackerapp.R
 import com.example.habittrackerapp.navigation.Screen
 import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
+import com.example.habittrackerapp.viewmodel.AuthViewModel
 
 @Composable
 fun ProfileSettingsScreen(
     navController: NavController,
-    windowSizeClass: WindowSizeClass
+    windowSizeClass: WindowSizeClass,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
     var notificationsEnabled by remember { mutableStateOf(true) }
     val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
@@ -117,9 +120,13 @@ fun ProfileSettingsScreen(
                 Spacer(modifier = Modifier.height(if (isPhoneLandscape) 16.dp else 24.dp))
                 
                 OutlinedButton(
-                    onClick = { navController.navigate(Screen.Welcome.route) {
-                        popUpTo(0)
-                    } },
+                    onClick = { 
+                        viewModel.logout {
+                            navController.navigate(Screen.Welcome.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth().height(if (isPhoneLandscape) 48.dp else 56.dp),
                     shape = RoundedCornerShape(28.dp),
                     border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)

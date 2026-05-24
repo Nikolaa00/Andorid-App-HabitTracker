@@ -2,6 +2,7 @@ package com.example.habittrackerapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habittrackerapp.data.repository.AuthRepository
 import com.example.habittrackerapp.data.repository.HabitRepository
 import com.example.habittrackerapp.domain.model.AppSettings
 import com.example.habittrackerapp.domain.model.User
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
     private val repository: HabitRepository
 ) : ViewModel() {
 
@@ -81,6 +83,7 @@ class RegisterViewModel @Inject constructor(
             _isLoading.value = true
             _errorMessage.value = null
             
+            // Simulation for now, Part 3 will replace this
             val userId = UUID.randomUUID().toString()
             initializeUser(userId, _username.value, _email.value)
             
@@ -116,12 +119,24 @@ class RegisterViewModel @Inject constructor(
     fun continueAsGuest(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
+            _errorMessage.value = null
             
-            val userId = UUID.randomUUID().toString()
-            initializeUser(userId, "Guest User", null)
-
-            _isLoading.value = false
-            onSuccess()
+            authRepository.signInAnonymously()
+                .onSuccess { authResult ->
+                    val firebaseUser = authResult.user
+                    if (firebaseUser != null) {
+                        initializeUser(firebaseUser.uid, "Guest User", null)
+                        _isLoading.value = false
+                        onSuccess()
+                    } else {
+                        _errorMessage.value = "Firebase user is null"
+                        _isLoading.value = false
+                    }
+                }
+                .onFailure { exception ->
+                    _errorMessage.value = exception.message ?: "Anonymous sign-in failed"
+                    _isLoading.value = false
+                }
         }
     }
 

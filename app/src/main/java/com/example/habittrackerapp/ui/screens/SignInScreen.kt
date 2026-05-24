@@ -1,5 +1,6 @@
 package com.example.habittrackerapp.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -31,6 +33,7 @@ import com.example.habittrackerapp.R
 import com.example.habittrackerapp.navigation.Screen
 import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
+import com.example.habittrackerapp.viewmodel.AuthState
 import com.example.habittrackerapp.viewmodel.AuthViewModel
 
 @Composable
@@ -41,13 +44,22 @@ fun SignInScreen(
 ) {
     val email by viewModel.emailField.collectAsState()
     val password by viewModel.passwordField.collectAsState()
+    val authState by viewModel.authState.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val isLargeScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
     val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
     
     val horizontalPadding = if (isLargeScreen) 80.dp else 24.dp
     val verticalPadding = if (isPhoneLandscape) 8.dp else 32.dp
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Error) {
+            Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -85,7 +97,6 @@ fun SignInScreen(
                             .padding(if (isPhoneLandscape) 12.dp else 24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Logo box scaled down for landscape
                         Box(
                             modifier = Modifier
                                 .size(if (isPhoneLandscape) 40.dp else 64.dp)
@@ -147,7 +158,8 @@ fun SignInScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = EmeraldGreen,
                                 unfocusedBorderColor = LightGrayBorder
-                            )
+                            ),
+                            enabled = authState !is AuthState.Loading
                         )
 
                         Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 16.dp))
@@ -176,7 +188,8 @@ fun SignInScreen(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = EmeraldGreen,
                                 unfocusedBorderColor = LightGrayBorder
-                            )
+                            ),
+                            enabled = authState !is AuthState.Loading
                         )
 
                         Spacer(modifier = Modifier.height(if (isPhoneLandscape) 12.dp else 24.dp))
@@ -193,7 +206,8 @@ fun SignInScreen(
                                 .fillMaxWidth()
                                 .height(56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = EmeraldGreen),
-                            shape = RoundedCornerShape(28.dp)
+                            shape = RoundedCornerShape(28.dp),
+                            enabled = authState !is AuthState.Loading
                         ) {
                             Text(
                                 text = stringResource(R.string.sign_in_arrow),
@@ -229,7 +243,8 @@ fun SignInScreen(
                         )
 
                         TextButton(
-                            onClick = { navController.navigate(Screen.Register.route) }
+                            onClick = { navController.navigate(Screen.Register.route) },
+                            enabled = authState !is AuthState.Loading
                         ) {
                             Text(
                                 text = stringResource(R.string.register),
@@ -240,6 +255,17 @@ fun SignInScreen(
                         }
                     }
                 }
+            }
+        }
+
+        if (authState is AuthState.Loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = EmeraldGreen)
             }
         }
     }

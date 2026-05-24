@@ -1,5 +1,6 @@
 package com.example.habittrackerapp.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,9 +13,13 @@ import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -26,6 +31,7 @@ import com.example.habittrackerapp.R
 import com.example.habittrackerapp.navigation.Screen
 import com.example.habittrackerapp.ui.theme.DeepSlateBlue
 import com.example.habittrackerapp.ui.theme.EmeraldGreen
+import com.example.habittrackerapp.viewmodel.AuthState
 import com.example.habittrackerapp.viewmodel.AuthViewModel
 
 @Composable
@@ -34,8 +40,17 @@ fun WelcomeScreen(
     windowSizeClass: WindowSizeClass,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val authState by viewModel.authState.collectAsState()
+    val context = LocalContext.current
     val isLargeScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
     val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Error) {
+            Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
 
     val buttonModifier = if (isLargeScreen) {
         Modifier
@@ -100,7 +115,8 @@ fun WelcomeScreen(
                 onClick = { navController.navigate(Screen.Login.route) },
                 modifier = buttonModifier.height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = EmeraldGreen),
-                shape = RoundedCornerShape(28.dp)
+                shape = RoundedCornerShape(28.dp),
+                enabled = authState !is AuthState.Loading
             ) {
                 Text(
                     text = stringResource(R.string.login),
@@ -116,7 +132,8 @@ fun WelcomeScreen(
                 onClick = { navController.navigate(Screen.Register.route) },
                 modifier = buttonModifier.height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = DeepSlateBlue),
-                shape = RoundedCornerShape(28.dp)
+                shape = RoundedCornerShape(28.dp),
+                enabled = authState !is AuthState.Loading
             ) {
                 Text(
                     text = stringResource(R.string.register),
@@ -138,7 +155,8 @@ fun WelcomeScreen(
                 },
                 modifier = buttonModifier.height(56.dp),
                 shape = RoundedCornerShape(28.dp),
-                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)
+                border = ButtonDefaults.outlinedButtonBorder(enabled = authState !is AuthState.Loading),
+                enabled = authState !is AuthState.Loading
             ) {
                 Text(
                     text = stringResource(R.string.continue_as_guest),
@@ -156,6 +174,17 @@ fun WelcomeScreen(
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp
             )
+        }
+
+        if (authState is AuthState.Loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = EmeraldGreen)
+            }
         }
     }
 }
