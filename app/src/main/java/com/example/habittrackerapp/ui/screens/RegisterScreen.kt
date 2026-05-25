@@ -42,6 +42,7 @@ fun RegisterScreen(
     val password by viewModel.password.collectAsState()
     val confirmPassword by viewModel.confirmPassword.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val errorResId by viewModel.errorResId.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
     val isLargeScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
@@ -155,6 +156,15 @@ fun RegisterScreen(
                             isPassword = true
                         )
 
+                        errorResId?.let {
+                            Text(
+                                text = stringResource(it),
+                                color = Color.Red,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+
                         errorMessage?.let {
                             Text(
                                 text = it,
@@ -167,7 +177,13 @@ fun RegisterScreen(
                         Spacer(modifier = Modifier.height(if (isPhoneLandscape) 12.dp else 24.dp))
 
                         Button(
-                            onClick = { viewModel.register { navController.navigate(Screen.Home.route) } },
+                            onClick = { 
+                                viewModel.register { 
+                                    navController.navigate(Screen.Home.route) {
+                                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                                    }
+                                } 
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
@@ -230,7 +246,13 @@ fun RegisterScreen(
 
                         // Continue as Guest
                         OutlinedButton(
-                            onClick = { viewModel.continueAsGuest { navController.navigate(Screen.Home.route) } },
+                            onClick = { 
+                                viewModel.continueAsGuest { 
+                                    navController.navigate(Screen.Home.route) {
+                                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                                    }
+                                } 
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),

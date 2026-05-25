@@ -56,7 +56,13 @@ fun SignInScreen(
 
     LaunchedEffect(authState) {
         if (authState is AuthState.Error) {
-            Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_LONG).show()
+            val error = authState as AuthState.Error
+            val message = if (error.messageResId != null) {
+                context.getString(error.messageResId)
+            } else {
+                error.message ?: "Authentication failed"
+            }
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             viewModel.clearError()
         }
     }

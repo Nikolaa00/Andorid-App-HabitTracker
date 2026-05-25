@@ -26,6 +26,11 @@
     <string name="google">Google</string>
     <string name="facebook">Facebook</string>
     <string name="already_have_account">Веќе имате сметка? </string>
+    <string name="error_invalid_email">Невалидна е-пошта</string>
+    <string name="error_password_too_short">Лозинката мора да има најмалку 6 карактери</string>
+    <string name="error_passwords_dont_match">Лозинките не се совпаѓаат</string>
+    <string name="error_empty_fields">Ве молиме пополнете ги сите полиња</string>
+    <string name="error_auth_failed">Неуспешна автентикација: %1$s</string>
 
     <string name="greeting_user">Здраво, Кориснику!</string>
     <string name="streak_info">Продолжи така!</string>

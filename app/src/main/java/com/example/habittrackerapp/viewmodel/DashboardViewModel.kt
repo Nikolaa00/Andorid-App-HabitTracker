@@ -7,6 +7,7 @@ import com.example.habittrackerapp.domain.model.Habit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,6 +16,13 @@ import javax.inject.Inject
 class DashboardViewModel @Inject constructor(
     private val repository: HabitRepository
 ) : ViewModel() {
+
+    val currentUser = repository.userSession
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     val habits: StateFlow<List<Habit>> = repository.allHabits
         .stateIn(

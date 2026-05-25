@@ -37,6 +37,7 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val habits by viewModel.habits.collectAsState()
+    val currentUser by viewModel.currentUser.collectAsState()
     
     val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
     val horizontalPadding = if (isPhoneLandscape) 32.dp else 16.dp
@@ -67,8 +68,13 @@ fun DashboardScreen(
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(modifier = Modifier.padding(if (isPhoneLandscape) 16.dp else 24.dp)) {
+                    val greeting = if (currentUser?.displayName != null && currentUser?.email != null) {
+                        "Hello, ${currentUser?.displayName}!"
+                    } else {
+                        stringResource(R.string.greeting_user)
+                    }
                     Text(
-                        text = stringResource(R.string.greeting_user),
+                        text = greeting,
                         fontSize = if (isPhoneLandscape) 20.sp else 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1E293B)

@@ -34,6 +34,7 @@ fun ProfileSettingsScreen(
     windowSizeClass: WindowSizeClass,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val currentUser by viewModel.currentUser.collectAsState()
     var notificationsEnabled by remember { mutableStateOf(true) }
     val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
     val spacing = if (isPhoneLandscape) 8.dp else 16.dp
@@ -58,8 +59,13 @@ fun ProfileSettingsScreen(
                 modifier = Modifier.padding(if (isPhoneLandscape) 16.dp else 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                val displayName = if (currentUser?.displayName != null && currentUser?.email != null) {
+                    currentUser?.displayName ?: ""
+                } else {
+                    "User"
+                }
                 Text(
-                    text = stringResource(R.string.profile_name),
+                    text = displayName,
                     fontSize = if (isPhoneLandscape) 22.sp else 28.sp,
                     fontWeight = FontWeight.Bold
                 )

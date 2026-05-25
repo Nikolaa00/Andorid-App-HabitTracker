@@ -26,6 +26,11 @@
     <string name="google">Google</string>
     <string name="facebook">Facebook</string>
     <string name="already_have_account">Already have an account? </string>
+    <string name="error_invalid_email">Invalid email address</string>
+    <string name="error_password_too_short">Password must be at least 6 characters</string>
+    <string name="error_passwords_dont_match">Passwords do not match</string>
+    <string name="error_empty_fields">Please fill in all fields</string>
+    <string name="error_auth_failed">Authentication failed: %1$s</string>
 
     <string name="greeting_user">Hello, User!</string>
     <string name="streak_info">Keep it up!</string>
