@@ -211,6 +211,47 @@ class AuthViewModel @Inject constructor(
                 }
         }
     }
+
+    fun signInWithFacebook(accessToken: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            
+            authRepository.signInWithFacebook(accessToken)
+                .onSuccess { authResult ->
+                    val firebaseUser = authResult.user
+                    if (firebaseUser != null) {
+                        val userId = firebaseUser.uid
+                        
+                        val user = User(
+                            uid = userId,
+                            displayName = firebaseUser.displayName ?: "Facebook User",
+                            email = firebaseUser.email,
+                            photoUrl = firebaseUser.photoUrl?.toString(),
+                            bio = null,
+                            totalPoints = 0,
+                            createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        )
+                        
+                        repository.upsertUser(user)
+                        
+                        repository.upsertSettings(AppSettings(
+                            userId = userId,
+                            isDarkMode = false,
+                            notificationsEnabled = true,
+                            preferredLanguage = "en"
+                        ))
+                        
+                        _authState.value = AuthState.Success
+                        onSuccess()
+                    } else {
+                        _authState.value = AuthState.Error(message = "Firebase user is null")
+                    }
+                }
+                .onFailure { exception ->
+                    _authState.value = AuthState.Error(message = exception.message ?: "Facebook login failed")
+                }
+        }
+    }
 }
 
 sealed class AuthState {

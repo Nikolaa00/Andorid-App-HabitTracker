@@ -1,10 +1,12 @@
 package com.example.habittrackerapp.data.repository
 
 import android.content.Context
+import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -52,6 +54,16 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun signInWithFacebook(accessToken: String): Result<AuthResult> {
+        return try {
+            val credential = FacebookAuthProvider.getCredential(accessToken)
+            val result = firebaseAuth.signInWithCredential(credential).await()
+            Result.success(result)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun updateDisplayName(name: String): Result<Unit> {
         return try {
             val user = firebaseAuth.currentUser
@@ -78,6 +90,9 @@ class AuthRepositoryImpl @Inject constructor(
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
             val googleSignInClient = GoogleSignIn.getClient(context, gso)
             googleSignInClient.signOut().await()
+
+            // Sign out from Facebook to clear the session and force account picker
+            LoginManager.getInstance().logOut()
         } catch (e: Exception) {
             // Log or handle error if necessary
         }

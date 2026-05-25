@@ -31,6 +31,11 @@ import androidx.compose.ui.unit.sp
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,6 +58,40 @@ fun SignInScreen(
     val authState by viewModel.authState.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    val callbackManager = remember { CallbackManager.Factory.create() }
+    
+    // Facebook login launcher using legacy result API (needed for CallbackManager sync)
+    rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            callbackManager.onActivityResult(64206, result.resultCode, result.data)
+        }
+    )
+
+    DisposableEffect(Unit) {
+        val callback = object : FacebookCallback<LoginResult> {
+            override fun onSuccess(result: LoginResult) {
+                viewModel.signInWithFacebook(result.accessToken.token) {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                    }
+                }
+            }
+
+            override fun onCancel() {
+                Toast.makeText(context, R.string.error_facebook_signin_cancelled, Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onError(error: FacebookException) {
+                Toast.makeText(context, context.getString(R.string.error_facebook_signin_failed, error.message), Toast.LENGTH_SHORT).show()
+            }
+        }
+        LoginManager.getInstance().registerCallback(callbackManager, callback)
+        onDispose {
+            LoginManager.getInstance().unregisterCallback(callbackManager)
+        }
+    }
 
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -246,12 +285,16 @@ fun SignInScreen(
                             shape = RoundedCornerShape(28.dp),
                             enabled = authState !is AuthState.Loading
                         ) {
-                            Text(
-                                text = stringResource(R.string.sign_in_arrow),
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
+                            if (authState is AuthState.Loading) {
+                                CircularProgressIndicator(color = Color.Black, modifier = Modifier.size(24.dp))
+                            } else {
+                                Text(
+                                    text = stringResource(R.string.sign_in_arrow),
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -285,6 +328,41 @@ fun SignInScreen(
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Black
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Facebook Sign In Button
+                        Button(
+                            onClick = {
+                                LoginManager.getInstance().logInWithReadPermissions(
+                                    context as androidx.activity.ComponentActivity,
+                                    callbackManager,
+                                    listOf("email", "public_profile")
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1877F2)),
+                            shape = RoundedCornerShape(28.dp),
+                            enabled = authState !is AuthState.Loading
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_facebook),
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(R.string.facebook),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
                                 )
                             }
                         }
@@ -327,17 +405,6 @@ fun SignInScreen(
                         }
                     }
                 }
-            }
-        }
-
-        if (authState is AuthState.Loading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = EmeraldGreen)
             }
         }
     }

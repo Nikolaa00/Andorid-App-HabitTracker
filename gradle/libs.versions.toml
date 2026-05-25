@@ -15,6 +15,7 @@ appcompat = "1.7.0"
 ksp = "2.2.10-2.0.2"
 googleServices = "4.4.2"
 playServicesAuth = "21.3.0"
+facebookSdk = "18.2.3"
 firebaseBom = "33.9.0"
 
 [libraries]
@@ -46,6 +47,7 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+facebook-sdk = { group = "com.facebook.android", name = "facebook-android-sdk", version.ref = "facebookSdk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

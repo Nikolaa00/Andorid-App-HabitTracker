@@ -33,6 +33,11 @@
     <string name="error_auth_failed">Неуспешна автентикација: %1$s</string>
     <string name="error_google_signin_cancelled">Google најавата беше откажана.</string>
     <string name="error_google_signin_failed">Google најавата не успеа.</string>
+    <string name="facebook_app_id">960668496887576</string>
+    <string name="fb_login_protocol_scheme">fb960668496887576</string>
+    <string name="facebook_client_token">a1f75f51e39ffe9b6625f1edd8deaf61</string>
+    <string name="error_facebook_signin_cancelled">Facebook најавата беше откажана.</string>
+    <string name="error_facebook_signin_failed">Facebook најавата не успеа: %1$s</string>
 
     <string name="greeting_user">Здраво, Кориснику!</string>
     <string name="streak_info">Продолжи така!</string>

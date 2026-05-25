@@ -29,6 +29,11 @@ import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.NavController
@@ -52,6 +57,40 @@ fun RegisterScreen(
     val errorResId by viewModel.errorResId.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val context = LocalContext.current
+
+    val callbackManager = remember { CallbackManager.Factory.create() }
+    
+    // Facebook login launcher using legacy result API (needed for CallbackManager sync)
+    rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            callbackManager.onActivityResult(64206, result.resultCode, result.data)
+        }
+    )
+
+    DisposableEffect(Unit) {
+        val callback = object : FacebookCallback<LoginResult> {
+            override fun onSuccess(result: LoginResult) {
+                viewModel.signInWithFacebook(result.accessToken.token) {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                    }
+                }
+            }
+
+            override fun onCancel() {
+                Toast.makeText(context, R.string.error_facebook_signin_cancelled, Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onError(error: FacebookException) {
+                Toast.makeText(context, context.getString(R.string.error_facebook_signin_failed, error.message), Toast.LENGTH_SHORT).show()
+            }
+        }
+        LoginManager.getInstance().registerCallback(callbackManager, callback)
+        onDispose {
+            LoginManager.getInstance().unregisterCallback(callbackManager)
+        }
+    }
 
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -278,7 +317,13 @@ fun RegisterScreen(
                                 containerColor = Color.White,
                                 contentColor = Color.Black,
                                 modifier = Modifier.weight(1f),
-                                onClick = { viewModel.registerWithFacebook { navController.navigate(Screen.Home.route) } }
+                                onClick = { 
+                                    LoginManager.getInstance().logInWithReadPermissions(
+                                        context as androidx.activity.ComponentActivity,
+                                        callbackManager,
+                                        listOf("email", "public_profile")
+                                    )
+                                }
                             )
                         }
 
