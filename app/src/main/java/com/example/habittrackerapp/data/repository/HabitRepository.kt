@@ -20,6 +20,11 @@ class HabitRepository @Inject constructor(
     private val userDao: UserDao
 ) {
     // Habit Operations
+    fun getHabitsForUser(userId: String): Flow<List<Habit>> = 
+        habitDao.getHabitsByUserId(userId).map { entities ->
+            entities.map { it.toDomain() }
+        }
+
     val allHabits: Flow<List<Habit>> = habitDao.getAllHabits().map { entities ->
         entities.map { it.toDomain() }
     }

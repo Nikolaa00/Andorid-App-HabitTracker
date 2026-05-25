@@ -58,9 +58,11 @@ class CreateHabitViewModel @Inject constructor(
 
     fun saveHabit(onSuccess: () -> Unit) {
         viewModelScope.launch {
+            val currentUserId = repository.userSession.value?.uid ?: return@launch
             if (_name.value.isBlank()) return@launch
             
             val newHabit = Habit(
+                userId = currentUserId,
                 name = _name.value,
                 description = _description.value,
                 frequency = _frequency.value,

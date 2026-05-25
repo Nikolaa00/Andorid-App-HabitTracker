@@ -4,6 +4,7 @@ import java.time.LocalTime
 
 data class Habit(
     val id: Int = 0,
+    val userId: String, // Owner ID
     val name: String,
     val description: String,
     val frequency: List<Int>,
