@@ -32,6 +32,7 @@ import com.google.android.gms.common.api.ApiException
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
+import com.facebook.login.LoginBehavior
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -79,6 +80,7 @@ fun RegisterScreen(
             }
 
             override fun onCancel() {
+                viewModel.clearError()
                 Toast.makeText(context, R.string.error_facebook_signin_cancelled, Toast.LENGTH_SHORT).show()
             }
 
@@ -318,6 +320,8 @@ fun RegisterScreen(
                                 contentColor = Color.Black,
                                 modifier = Modifier.weight(1f),
                                 onClick = { 
+                                    LoginManager.getInstance().logOut()
+                                    LoginManager.getInstance().setLoginBehavior(LoginBehavior.WEB_ONLY)
                                     LoginManager.getInstance().logInWithReadPermissions(
                                         context as androidx.activity.ComponentActivity,
                                         callbackManager,
