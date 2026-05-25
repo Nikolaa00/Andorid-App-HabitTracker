@@ -128,8 +128,36 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
+    fun signInWithGoogle(idToken: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            
+            authRepository.signInWithGoogle(idToken)
+                .onSuccess { authResult ->
+                    val firebaseUser = authResult.user
+                    if (firebaseUser != null) {
+                        initializeUser(
+                            firebaseUser.uid, 
+                            firebaseUser.displayName ?: "Google User", 
+                            firebaseUser.email
+                        )
+                        _isLoading.value = false
+                        onSuccess()
+                    } else {
+                        _errorMessage.value = "Firebase user is null"
+                        _isLoading.value = false
+                    }
+                }
+                .onFailure { exception ->
+                    _errorMessage.value = exception.message ?: "Google login failed"
+                    _isLoading.value = false
+                }
+        }
+    }
+
     fun registerWithGoogle(onSuccess: () -> Unit) {
-        // Implementation for future parts
+        // Obsolete if we use the above
     }
 
     fun registerWithFacebook(onSuccess: () -> Unit) {

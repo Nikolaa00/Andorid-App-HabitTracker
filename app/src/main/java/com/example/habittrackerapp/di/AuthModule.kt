@@ -1,11 +1,13 @@
 package com.example.habittrackerapp.di
 
+import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.example.habittrackerapp.data.repository.AuthRepository
 import com.example.habittrackerapp.data.repository.AuthRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -19,7 +21,10 @@ object AuthModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(auth: FirebaseAuth): AuthRepository {
-        return AuthRepositoryImpl(auth)
+    fun provideAuthRepository(
+        auth: FirebaseAuth,
+        @ApplicationContext context: Context
+    ): AuthRepository {
+        return AuthRepositoryImpl(auth, context)
     }
 }

@@ -6,7 +6,8 @@ interface AuthRepository {
     suspend fun signInAnonymously(): Result<AuthResult>
     suspend fun registerWithEmail(email: String, password: String): Result<AuthResult>
     suspend fun loginWithEmail(email: String, password: String): Result<AuthResult>
+    suspend fun signInWithGoogle(idToken: String): Result<AuthResult>
     suspend fun updateDisplayName(name: String): Result<Unit>
-    fun logout()
+    suspend fun logout()
     fun isUserLoggedIn(): Boolean
 }

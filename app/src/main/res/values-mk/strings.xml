@@ -31,6 +31,8 @@
     <string name="error_passwords_dont_match">Лозинките не се совпаѓаат</string>
     <string name="error_empty_fields">Ве молиме пополнете ги сите полиња</string>
     <string name="error_auth_failed">Неуспешна автентикација: %1$s</string>
+    <string name="error_google_signin_cancelled">Google најавата беше откажана.</string>
+    <string name="error_google_signin_failed">Google најавата не успеа.</string>
 
     <string name="greeting_user">Здраво, Кориснику!</string>
     <string name="streak_info">Продолжи така!</string>

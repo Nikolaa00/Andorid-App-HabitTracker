@@ -68,8 +68,11 @@ class AuthViewModel @Inject constructor(
     }
 
     fun logout(onSuccess: () -> Unit) {
-        authRepository.logout()
-        onSuccess()
+        viewModelScope.launch {
+            authRepository.logout()
+            repository.clearSession()
+            onSuccess()
+        }
     }
 
     fun signInAnonymously(onSuccess: () -> Unit) {
@@ -162,6 +165,49 @@ class AuthViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     _authState.value = AuthState.Error(message = exception.message ?: "Login failed")
+                }
+        }
+    }
+
+    fun signInWithGoogle(idToken: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            
+            authRepository.signInWithGoogle(idToken)
+                .onSuccess { authResult ->
+                    val firebaseUser = authResult.user
+                    if (firebaseUser != null) {
+                        val userId = firebaseUser.uid
+                        
+                        // Sync with local DB
+                        val user = User(
+                            uid = userId,
+                            displayName = firebaseUser.displayName ?: "User",
+                            email = firebaseUser.email,
+                            photoUrl = firebaseUser.photoUrl?.toString(),
+                            bio = null,
+                            totalPoints = 0,
+                            createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        )
+                        
+                        repository.upsertUser(user)
+                        
+                        // Initialize default settings if not exists
+                        repository.upsertSettings(AppSettings(
+                            userId = userId,
+                            isDarkMode = false,
+                            notificationsEnabled = true,
+                            preferredLanguage = "en"
+                        ))
+                        
+                        _authState.value = AuthState.Success
+                        onSuccess()
+                    } else {
+                        _authState.value = AuthState.Error(message = "Firebase user is null")
+                    }
+                }
+                .onFailure { exception ->
+                    _authState.value = AuthState.Error(message = exception.message ?: "Google login failed")
                 }
         }
     }
