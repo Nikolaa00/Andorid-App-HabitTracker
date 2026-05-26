@@ -28,9 +28,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -39,6 +36,11 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.habittrackerapp.R
@@ -47,6 +49,7 @@ import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
 import com.example.habittrackerapp.viewmodel.AuthState
 import com.example.habittrackerapp.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(
@@ -58,7 +61,20 @@ fun SignInScreen(
     val password by viewModel.passwordField.collectAsState()
     val authState by viewModel.authState.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
+    
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val credentialManager = remember { CredentialManager.create(context) }
+    
+    // Define localized strings at the top to avoid LocalContext.current lint warnings
+    val fbCancelledMsg = stringResource(R.string.error_facebook_signin_cancelled)
+    val fbFailedMsg = stringResource(R.string.error_facebook_signin_failed)
+    val googleFailedMsg = stringResource(R.string.error_google_signin_failed)
+    val webClientId = stringResource(R.string.default_web_client_id)
+    val authFailedMsg = "Authentication failed" 
+
+    val emptyFieldsMsg = stringResource(R.string.error_empty_fields)
+    val invalidEmailMsg = stringResource(R.string.error_invalid_email)
 
     val callbackManager = remember { CallbackManager.Factory.create() }
     
@@ -82,41 +98,16 @@ fun SignInScreen(
 
             override fun onCancel() {
                 viewModel.clearError()
-                Toast.makeText(context, R.string.error_facebook_signin_cancelled, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, fbCancelledMsg, Toast.LENGTH_SHORT).show()
             }
 
             override fun onError(error: FacebookException) {
-                Toast.makeText(context, context.getString(R.string.error_facebook_signin_failed, error.message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "$fbFailedMsg: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         }
         LoginManager.getInstance().registerCallback(callbackManager, callback)
         onDispose {
             LoginManager.getInstance().unregisterCallback(callbackManager)
-        }
-    }
-
-    val googleSignInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(ApiException::class.java)
-            account.idToken?.let { idToken ->
-                viewModel.signInWithGoogle(idToken) {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Welcome.route) { inclusive = true }
-                    }
-                }
-            } ?: run {
-                Toast.makeText(context, context.getString(R.string.error_google_signin_failed), Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: ApiException) {
-            val msg = if (e.statusCode == 12501) {
-                context.getString(R.string.error_google_signin_cancelled)
-            } else {
-                context.getString(R.string.error_google_signin_failed) + ": ${e.statusCode}"
-            }
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -129,10 +120,11 @@ fun SignInScreen(
     LaunchedEffect(authState) {
         if (authState is AuthState.Error) {
             val error = authState as AuthState.Error
-            val message = if (error.messageResId != null) {
-                context.getString(error.messageResId)
-            } else {
-                error.message ?: "Authentication failed"
+            val message = when {
+                error.messageResId == R.string.error_empty_fields -> emptyFieldsMsg
+                error.messageResId == R.string.error_invalid_email -> invalidEmailMsg
+                error.message != null -> error.message
+                else -> authFailedMsg
             }
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             viewModel.clearError()
@@ -304,12 +296,34 @@ fun SignInScreen(
                         // Google Sign In Button
                         OutlinedButton(
                             onClick = {
-                                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                    .requestIdToken(context.getString(R.string.default_web_client_id))
-                                    .requestEmail()
-                                    .build()
-                                val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                                googleSignInLauncher.launch(googleSignInClient.signInIntent)
+                                coroutineScope.launch {
+                                    val googleIdOption = GetGoogleIdOption.Builder()
+                                        .setFilterByAuthorizedAccounts(false)
+                                        .setServerClientId(webClientId)
+                                        .setAutoSelectEnabled(true)
+                                        .build()
+
+                                    val request = GetCredentialRequest.Builder()
+                                        .addCredentialOption(googleIdOption)
+                                        .build()
+
+                                    try {
+                                        val result = credentialManager.getCredential(
+                                            context = context,
+                                            request = request
+                                        )
+                                        val credential = result.credential
+                                        if (credential is GoogleIdTokenCredential) {
+                                            viewModel.signInWithGoogle(credential.idToken) {
+                                                navController.navigate(Screen.Home.route) {
+                                                    popUpTo(Screen.Welcome.route) { inclusive = true }
+                                                }
+                                            }
+                                        }
+                                    } catch (e: GetCredentialException) {
+                                        Toast.makeText(context, "$googleFailedMsg: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
