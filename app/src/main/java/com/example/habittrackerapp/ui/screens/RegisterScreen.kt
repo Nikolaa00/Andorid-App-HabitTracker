@@ -42,6 +42,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import androidx.navigation.NavController
 import com.example.habittrackerapp.R
 import com.example.habittrackerapp.navigation.Screen
+import com.example.habittrackerapp.ui.components.SocialAuthButton
 import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
 import com.example.habittrackerapp.viewmodel.RegisterViewModel
@@ -435,33 +436,5 @@ fun RegisterInputField(
                 unfocusedContainerColor = Color(0xFFFBFBFB)
             )
         )
-    }
-}
-
-@Composable
-fun SocialAuthButton(
-    text: String,
-    icon: Painter,
-    containerColor: Color,
-    contentColor: Color,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier.height(48.dp),
-        shape = RoundedCornerShape(24.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = containerColor),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
-        border = if (containerColor == Color.White) androidx.compose.foundation.BorderStroke(1.dp, LightGrayBorder) else null
-    ) {
-        Icon(
-            painter = icon,
-            contentDescription = null,
-            tint = Color.Unspecified,
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text, color = contentColor, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
 }

@@ -45,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.habittrackerapp.R
 import com.example.habittrackerapp.navigation.Screen
+import com.example.habittrackerapp.ui.components.SocialAuthButton
 import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
 import com.example.habittrackerapp.viewmodel.AuthState
@@ -293,96 +294,78 @@ fun SignInScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Google Sign In Button
-                        OutlinedButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    val googleIdOption = GetGoogleIdOption.Builder()
-                                        .setFilterByAuthorizedAccounts(false)
-                                        .setServerClientId(webClientId)
-                                        .setAutoSelectEnabled(true)
-                                        .build()
-
-                                    val request = GetCredentialRequest.Builder()
-                                        .addCredentialOption(googleIdOption)
-                                        .build()
-
-                                    try {
-                                        val result = credentialManager.getCredential(
-                                            context = context,
-                                            request = request
-                                        )
-                                        val credential = result.credential
-                                        if (credential is GoogleIdTokenCredential) {
-                                            viewModel.signInWithGoogle(credential.idToken) {
-                                                navController.navigate(Screen.Home.route) {
-                                                    popUpTo(Screen.Welcome.route) { inclusive = true }
-                                                }
-                                            }
-                                        }
-                                    } catch (e: GetCredentialException) {
-                                        Toast.makeText(context, "$googleFailedMsg: ${e.message}", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            shape = RoundedCornerShape(28.dp),
-                            enabled = authState !is AuthState.Loading
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_google),
-                                    contentDescription = null,
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = stringResource(R.string.google),
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black
-                                )
-                            }
+                        // OR Divider
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            HorizontalDivider(modifier = Modifier.weight(1f), color = LightGrayBorder)
+                            Text(
+                                text = " " + stringResource(R.string.or_divider) + " ",
+                                fontSize = 12.sp,
+                                color = Color.Gray,
+                                fontWeight = FontWeight.Medium
+                            )
+                            HorizontalDivider(modifier = Modifier.weight(1f), color = LightGrayBorder)
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Facebook Sign In Button
-                        Button(
-                            onClick = {
-                                LoginManager.getInstance().logOut()
-                                LoginManager.getInstance().setLoginBehavior(LoginBehavior.WEB_ONLY)
-                                LoginManager.getInstance().logInWithReadPermissions(
-                                    context as androidx.activity.ComponentActivity,
-                                    callbackManager,
-                                    listOf("email", "public_profile")
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1877F2)),
-                            shape = RoundedCornerShape(28.dp),
-                            enabled = authState !is AuthState.Loading
+                        // Social Buttons
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_facebook),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = stringResource(R.string.facebook),
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
+                            SocialAuthButton(
+                                text = stringResource(R.string.google),
+                                icon = painterResource(id = R.drawable.ic_google),
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        val googleIdOption = GetGoogleIdOption.Builder()
+                                            .setFilterByAuthorizedAccounts(false)
+                                            .setServerClientId(webClientId)
+                                            .setAutoSelectEnabled(true)
+                                            .build()
+
+                                        val request = GetCredentialRequest.Builder()
+                                            .addCredentialOption(googleIdOption)
+                                            .build()
+
+                                        try {
+                                            val result = credentialManager.getCredential(
+                                                context = context,
+                                                request = request
+                                            )
+                                            val credential = result.credential
+                                            if (credential is GoogleIdTokenCredential) {
+                                                viewModel.signInWithGoogle(credential.idToken) {
+                                                    navController.navigate(Screen.Home.route) {
+                                                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                                                    }
+                                                }
+                                            }
+                                        } catch (e: GetCredentialException) {
+                                            Toast.makeText(context, "$googleFailedMsg: ${e.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
+                            )
+                            SocialAuthButton(
+                                text = stringResource(R.string.facebook),
+                                icon = painterResource(id = R.drawable.ic_facebook),
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    LoginManager.getInstance().logOut()
+                                    LoginManager.getInstance().setLoginBehavior(LoginBehavior.WEB_ONLY)
+                                    LoginManager.getInstance().logInWithReadPermissions(
+                                        context as androidx.activity.ComponentActivity,
+                                        callbackManager,
+                                        listOf("email", "public_profile")
+                                    )
+                                }
+                            )
                         }
                     }
                 }
