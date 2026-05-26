@@ -62,6 +62,9 @@ fun RegisterScreen(
     val errorResId by viewModel.errorResId.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+    
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val credentialManager = remember { CredentialManager.create(context) }
@@ -207,7 +210,9 @@ fun RegisterScreen(
                             value = password,
                             onValueChange = viewModel::onPasswordChange,
                             placeholder = "••••••••",
-                            isPassword = true
+                            isPassword = true,
+                            isPasswordVisible = passwordVisible,
+                            onVisibilityToggle = { passwordVisible = !passwordVisible }
                         )
                         Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 16.dp))
                         RegisterInputField(
@@ -215,7 +220,9 @@ fun RegisterScreen(
                             value = confirmPassword,
                             onValueChange = viewModel::onConfirmPasswordChange,
                             placeholder = "••••••••",
-                            isPassword = true
+                            isPassword = true,
+                            isPasswordVisible = confirmPasswordVisible,
+                            onVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible }
                         )
 
                         errorResId?.let {
@@ -411,7 +418,9 @@ fun RegisterInputField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    isPasswordVisible: Boolean = false,
+    onVisibilityToggle: (() -> Unit)? = null
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -428,7 +437,17 @@ fun RegisterInputField(
             placeholder = { Text(placeholder, color = Color.LightGray) },
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
-            visualTransformation = if (isPassword) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
+            visualTransformation = if (isPassword && !isPasswordVisible) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
+            trailingIcon = if (isPassword && onVisibilityToggle != null) {
+                {
+                    IconButton(onClick = onVisibilityToggle) {
+                        Icon(
+                            imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = null
+                        )
+                    }
+                }
+            } else null,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = EmeraldGreen,
                 unfocusedBorderColor = LightGrayBorder,

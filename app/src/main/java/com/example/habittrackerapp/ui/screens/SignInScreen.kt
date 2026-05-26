@@ -215,20 +215,24 @@ fun SignInScreen(
                 ) {
                     Column(modifier = Modifier.padding(if (isPhoneLandscape) 12.dp else 24.dp)) {
                         Text(
-                            text = stringResource(R.string.email_address_label),
+                            text = stringResource(R.string.email_address_label).uppercase(),
                             fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Gray
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(bottom = 4.dp)
                         )
                         OutlinedTextField(
                             value = email,
                             onValueChange = viewModel::onEmailChange,
                             modifier = Modifier.fillMaxWidth(),
-                            placeholder = { Text(stringResource(R.string.email_hint)) },
+                            placeholder = { Text(stringResource(R.string.email_hint), color = Color.LightGray) },
                             shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = EmeraldGreen,
-                                unfocusedBorderColor = LightGrayBorder
+                                unfocusedBorderColor = LightGrayBorder,
+                                focusedContainerColor = Color(0xFFFBFBFB),
+                                unfocusedContainerColor = Color(0xFFFBFBFB)
                             ),
                             enabled = authState !is AuthState.Loading
                         )
@@ -236,17 +240,19 @@ fun SignInScreen(
                         Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 16.dp))
 
                         Text(
-                            text = stringResource(R.string.password_label),
+                            text = stringResource(R.string.password_label).uppercase(),
                             fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Gray
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(bottom = 4.dp)
                         )
                         OutlinedTextField(
                             value = password,
                             onValueChange = viewModel::onPasswordChange,
                             modifier = Modifier.fillMaxWidth(),
-                            placeholder = { Text("••••••••") },
+                            placeholder = { Text("••••••••", color = Color.LightGray) },
                             shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                             trailingIcon = {
                                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -258,7 +264,9 @@ fun SignInScreen(
                             },
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = EmeraldGreen,
-                                unfocusedBorderColor = LightGrayBorder
+                                unfocusedBorderColor = LightGrayBorder,
+                                focusedContainerColor = Color(0xFFFBFBFB),
+                                unfocusedContainerColor = Color(0xFFFBFBFB)
                             ),
                             enabled = authState !is AuthState.Loading
                         )

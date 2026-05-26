@@ -1,16 +1,16 @@
 <resources>
     <string name="app_name">Следач на навики</string>
     <string name="track_daily_habits">Следете ги вашите дневни навики</string>
-    <string name="welcome_to_habit_tracker">Добредојдовте во Следач на навики</string>
+    <string name="welcome_to_habit_tracker">Добре дојдовте во Следач на навики</string>
     <string name="welcome_description">Следете навики, градете рутини и подобрете ја дневната конзистентност.</string>
     <string name="login">Најава</string>
     <string name="register">Регистрација</string>
     <string name="continue_as_guest">Продолжи како гостин</string>
     <string name="habits_shape_future">ВАШИТЕ НАВИКИ ЈА ОБЛИКУВААТ ВАШАТА ИДНИНА.</string>
-    <string name="welcome_back">Добредојдовте назад</string>
-    <string name="sign_in_to_continue">Најавете се за да ја продолжите вашата серија и да го следите вашиот напредок денес.</string>
+    <string name="welcome_back">Добре дојдовте назад</string>
+    <string name="sign_in_to_continue">Најавете се за да ја продолжите вашата сесија и да го следите вашиот напредок денес.</string>
     <string name="email_address_label">Е-ПОШТА</string>
-    <string name="email_hint">ime@primer.com</string>
+    <string name="email_hint">name@example.com</string>
     <string name="password_label">ЛОЗИНКА</string>
     <string name="sign_in_arrow">Најави се -></string>
     <string name="dont_have_account_register">Немате сметка?</string>
@@ -39,7 +39,7 @@
     <string name="error_facebook_signin_cancelled">Facebook најавата беше откажана.</string>
     <string name="error_facebook_signin_failed">Facebook најавата не успеа: %1$s</string>
 
-    <string name="greeting_user">Здраво, Кориснику!</string>
+    <string name="greeting_user">Здраво, Корисник!</string>
     <string name="streak_info">Продолжи така!</string>
     <string name="daily_progress">Дневен Напредок</string>
     <string name="progress_subtext">Денес заврши %1$d од %2$d навики. Продолжи така!</string>
