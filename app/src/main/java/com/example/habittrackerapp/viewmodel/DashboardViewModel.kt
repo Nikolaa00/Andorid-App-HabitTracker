@@ -5,23 +5,40 @@ import androidx.lifecycle.viewModelScope
 import com.example.habittrackerapp.data.repository.HabitRepository
 import com.example.habittrackerapp.domain.model.Habit
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val repository: HabitRepository
 ) : ViewModel() {
 
-    val habits: StateFlow<List<Habit>> = repository.allHabits
+    val currentUser = repository.userSession
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
+            initialValue = null
         )
+
+    val habits: StateFlow<List<Habit>> = currentUser.flatMapLatest { user ->
+        if (user != null) {
+            repository.getHabitsForUser(user.uid)
+        } else {
+            flowOf(emptyList())
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     fun updateHabitProgress(habit: Habit, newProgress: Int) {
         viewModelScope.launch {

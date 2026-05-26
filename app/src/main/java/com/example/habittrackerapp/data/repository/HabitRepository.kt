@@ -7,6 +7,7 @@ import com.example.habittrackerapp.data.mapper.toEntity
 import com.example.habittrackerapp.domain.model.AppSettings
 import com.example.habittrackerapp.domain.model.Habit
 import com.example.habittrackerapp.domain.model.User
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -17,9 +18,15 @@ import javax.inject.Singleton
 @Singleton
 class HabitRepository @Inject constructor(
     private val habitDao: HabitDao,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val firebaseAuth: FirebaseAuth
 ) {
     // Habit Operations
+    fun getHabitsForUser(userId: String): Flow<List<Habit>> = 
+        habitDao.getHabitsByUserId(userId).map { entities ->
+            entities.map { it.toDomain() }
+        }
+
     val allHabits: Flow<List<Habit>> = habitDao.getAllHabits().map { entities ->
         entities.map { it.toDomain() }
     }
@@ -43,8 +50,13 @@ class HabitRepository @Inject constructor(
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            val lastUser = userDao.getAllUsers().first().firstOrNull()
-            _userSession.value = lastUser?.toDomain()
+            val currentUid = firebaseAuth.currentUser?.uid
+            if (currentUid != null) {
+                val user = userDao.getUserByIdSuspend(currentUid)
+                _userSession.value = user?.toDomain()
+            } else {
+                _userSession.value = null
+            }
             _isSessionLoaded.value = true
         }
     }

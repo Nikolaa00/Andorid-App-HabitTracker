@@ -1,22 +1,36 @@
 package com.example.habittrackerapp.viewmodel
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habittrackerapp.R
+import com.example.habittrackerapp.data.repository.AuthRepository
 import com.example.habittrackerapp.data.repository.HabitRepository
 import com.example.habittrackerapp.domain.model.AppSettings
 import com.example.habittrackerapp.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
     private val repository: HabitRepository
 ) : ViewModel() {
+
+    val currentUser = repository.userSession
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
@@ -49,96 +63,193 @@ class AuthViewModel @Inject constructor(
         _confirmPasswordField.value = value
     }
 
+    fun clearError() {
+        _authState.value = AuthState.Idle
+    }
+
+    fun logout(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            authRepository.logout()
+            repository.clearSession()
+            onSuccess()
+        }
+    }
+
     fun signInAnonymously(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             
-            // Simulation of Firebase Auth successful login
-            val userId = UUID.randomUUID().toString()
-            val anonymousUser = User(
-                uid = userId,
-                displayName = "Anonymous User",
-                email = null,
-                photoUrl = null,
-                bio = null,
-                totalPoints = 0,
-                joinedDate = System.currentTimeMillis()
-            )
-            
-            repository.upsertUser(anonymousUser)
-            
-            // Initialize default settings
-            repository.upsertSettings(AppSettings(
-                userId = userId,
-                isDarkMode = false,
-                notificationsEnabled = true,
-                preferredLanguage = "en"
-            ))
-            
-            _authState.value = AuthState.Success
-            onSuccess()
+            authRepository.signInAnonymously()
+                .onSuccess { authResult ->
+                    val firebaseUser = authResult.user
+                    if (firebaseUser != null) {
+                        val userId = firebaseUser.uid
+                        val anonymousUser = User(
+                            uid = userId,
+                            displayName = "Anonymous User",
+                            email = null,
+                            photoUrl = null,
+                            bio = null,
+                            totalPoints = 0,
+                            createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        )
+                        
+                        repository.upsertUser(anonymousUser)
+                        
+                        // Initialize default settings
+                        repository.upsertSettings(AppSettings(
+                            userId = userId,
+                            isDarkMode = false,
+                            notificationsEnabled = true,
+                            preferredLanguage = "en"
+                        ))
+                        
+                        _authState.value = AuthState.Success
+                        onSuccess()
+                    } else {
+                        _authState.value = AuthState.Error(message = "Firebase user is null")
+                    }
+                }
+                .onFailure { exception ->
+                    _authState.value = AuthState.Error(message = exception.message ?: "Anonymous sign-in failed")
+                }
         }
     }
 
     fun signInWithEmail(onSuccess: () -> Unit) {
+        if (_emailField.value.isBlank() || _passwordField.value.isBlank()) {
+            _authState.value = AuthState.Error(messageResId = R.string.error_empty_fields)
+            return
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(_emailField.value).matches()) {
+            _authState.value = AuthState.Error(messageResId = R.string.error_invalid_email)
+            return
+        }
+
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             
-            // Simulation of Firebase Auth successful login
-            val userId = UUID.randomUUID().toString()
-            val user = User(
-                uid = userId,
-                displayName = "Logged User",
-                email = _emailField.value,
-                photoUrl = null,
-                bio = null,
-                totalPoints = 0,
-                joinedDate = System.currentTimeMillis()
-            )
-            
-            repository.upsertUser(user)
-            
-            // Initialize default settings if not exists
-            repository.upsertSettings(AppSettings(
-                userId = userId,
-                isDarkMode = false,
-                notificationsEnabled = true,
-                preferredLanguage = "en"
-            ))
-            
-            _authState.value = AuthState.Success
-            onSuccess()
+            authRepository.loginWithEmail(_emailField.value, _passwordField.value)
+                .onSuccess { authResult ->
+                    val firebaseUser = authResult.user
+                    if (firebaseUser != null) {
+                        val userId = firebaseUser.uid
+                        
+                        // Sync with local DB using cloud display name
+                        val user = User(
+                            uid = userId,
+                            displayName = firebaseUser.displayName ?: "User",
+                            email = _emailField.value,
+                            photoUrl = firebaseUser.photoUrl?.toString(),
+                            bio = null,
+                            totalPoints = 0,
+                            createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        )
+                        
+                        repository.upsertUser(user)
+                        
+                        // Initialize default settings if not exists
+                        repository.upsertSettings(AppSettings(
+                            userId = userId,
+                            isDarkMode = false,
+                            notificationsEnabled = true,
+                            preferredLanguage = "en"
+                        ))
+                        
+                        _authState.value = AuthState.Success
+                        onSuccess()
+                    } else {
+                        _authState.value = AuthState.Error(message = "Firebase user is null")
+                    }
+                }
+                .onFailure { exception ->
+                    _authState.value = AuthState.Error(message = exception.message ?: "Login failed")
+                }
         }
     }
 
-    fun registerWithEmail(onSuccess: () -> Unit) {
+    fun signInWithGoogle(idToken: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             
-            // Simulation of Firebase Auth successful registration
-            val userId = UUID.randomUUID().toString()
-            val newUser = User(
-                uid = userId,
-                displayName = _usernameField.value,
-                email = _emailField.value,
-                photoUrl = null,
-                bio = null,
-                totalPoints = 0,
-                joinedDate = System.currentTimeMillis()
-            )
-            
-            repository.upsertUser(newUser)
-            
-            // Initialize default settings
-            repository.upsertSettings(AppSettings(
-                userId = userId,
-                isDarkMode = false,
-                notificationsEnabled = true,
-                preferredLanguage = "en"
-            ))
+            authRepository.signInWithGoogle(idToken)
+                .onSuccess { authResult ->
+                    val firebaseUser = authResult.user
+                    if (firebaseUser != null) {
+                        val userId = firebaseUser.uid
+                        
+                        // Sync with local DB
+                        val user = User(
+                            uid = userId,
+                            displayName = firebaseUser.displayName ?: "User",
+                            email = firebaseUser.email,
+                            photoUrl = firebaseUser.photoUrl?.toString(),
+                            bio = null,
+                            totalPoints = 0,
+                            createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        )
+                        
+                        repository.upsertUser(user)
+                        
+                        // Initialize default settings if not exists
+                        repository.upsertSettings(AppSettings(
+                            userId = userId,
+                            isDarkMode = false,
+                            notificationsEnabled = true,
+                            preferredLanguage = "en"
+                        ))
+                        
+                        _authState.value = AuthState.Success
+                        onSuccess()
+                    } else {
+                        _authState.value = AuthState.Error(message = "Firebase user is null")
+                    }
+                }
+                .onFailure { exception ->
+                    _authState.value = AuthState.Error(message = exception.message ?: "Google login failed")
+                }
+        }
+    }
 
-            _authState.value = AuthState.Success
-            onSuccess()
+    fun signInWithFacebook(accessToken: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            
+            authRepository.signInWithFacebook(accessToken)
+                .onSuccess { authResult ->
+                    val firebaseUser = authResult.user
+                    if (firebaseUser != null) {
+                        val userId = firebaseUser.uid
+                        
+                        val user = User(
+                            uid = userId,
+                            displayName = firebaseUser.displayName ?: "Facebook User",
+                            email = firebaseUser.email,
+                            photoUrl = firebaseUser.photoUrl?.toString(),
+                            bio = null,
+                            totalPoints = 0,
+                            createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        )
+                        
+                        repository.upsertUser(user)
+                        
+                        repository.upsertSettings(AppSettings(
+                            userId = userId,
+                            isDarkMode = false,
+                            notificationsEnabled = true,
+                            preferredLanguage = "en"
+                        ))
+                        
+                        _authState.value = AuthState.Success
+                        onSuccess()
+                    } else {
+                        _authState.value = AuthState.Error(message = "Firebase user is null")
+                    }
+                }
+                .onFailure { exception ->
+                    _authState.value = AuthState.Error(message = exception.message ?: "Facebook login failed")
+                }
         }
     }
 }
@@ -147,5 +258,5 @@ sealed class AuthState {
     object Idle : AuthState()
     object Loading : AuthState()
     object Success : AuthState()
-    data class Error(val message: String) : AuthState()
+    data class Error(val message: String? = null, val messageResId: Int? = null) : AuthState()
 }

@@ -20,17 +20,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.habittrackerapp.R
 import com.example.habittrackerapp.navigation.Screen
 import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
+import com.example.habittrackerapp.viewmodel.AuthViewModel
 
 @Composable
 fun ProfileSettingsScreen(
     navController: NavController,
-    windowSizeClass: WindowSizeClass
+    windowSizeClass: WindowSizeClass,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val currentUser by viewModel.currentUser.collectAsState()
     var notificationsEnabled by remember { mutableStateOf(true) }
     val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
     val spacing = if (isPhoneLandscape) 8.dp else 16.dp
@@ -55,8 +59,13 @@ fun ProfileSettingsScreen(
                 modifier = Modifier.padding(if (isPhoneLandscape) 16.dp else 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                val displayName = if (currentUser?.displayName != null && currentUser?.email != null) {
+                    currentUser?.displayName ?: ""
+                } else {
+                    "User"
+                }
                 Text(
-                    text = stringResource(R.string.profile_name),
+                    text = displayName,
                     fontSize = if (isPhoneLandscape) 22.sp else 28.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -117,9 +126,13 @@ fun ProfileSettingsScreen(
                 Spacer(modifier = Modifier.height(if (isPhoneLandscape) 16.dp else 24.dp))
                 
                 OutlinedButton(
-                    onClick = { navController.navigate(Screen.Welcome.route) {
-                        popUpTo(0)
-                    } },
+                    onClick = { 
+                        viewModel.logout {
+                            navController.navigate(Screen.Welcome.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth().height(if (isPhoneLandscape) 48.dp else 56.dp),
                     shape = RoundedCornerShape(28.dp),
                     border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)

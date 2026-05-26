@@ -24,12 +24,29 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginBehavior
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import androidx.navigation.NavController
 import com.example.habittrackerapp.R
 import com.example.habittrackerapp.navigation.Screen
+import com.example.habittrackerapp.ui.components.SocialAuthButton
 import com.example.habittrackerapp.ui.theme.EmeraldGreen
 import com.example.habittrackerapp.ui.theme.LightGrayBorder
 import com.example.habittrackerapp.viewmodel.RegisterViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(
@@ -42,7 +59,56 @@ fun RegisterScreen(
     val password by viewModel.password.collectAsState()
     val confirmPassword by viewModel.confirmPassword.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val errorResId by viewModel.errorResId.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+    
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val credentialManager = remember { CredentialManager.create(context) }
+    
+    // Define localized strings at the top to avoid LocalContext.current lint warnings
+    val fbCancelledMsg = stringResource(R.string.error_facebook_signin_cancelled)
+    val fbFailedMsg = stringResource(R.string.error_facebook_signin_failed)
+    val googleFailedMsg = stringResource(R.string.error_google_signin_failed)
+    val webClientId = stringResource(R.string.default_web_client_id)
+
+    val callbackManager = remember { CallbackManager.Factory.create() }
+    
+    // Facebook login launcher using legacy result API (needed for CallbackManager sync)
+    rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            callbackManager.onActivityResult(64206, result.resultCode, result.data)
+        }
+    )
+
+    DisposableEffect(Unit) {
+        val callback = object : FacebookCallback<LoginResult> {
+            override fun onSuccess(result: LoginResult) {
+                viewModel.signInWithFacebook(result.accessToken.token) {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                    }
+                }
+            }
+
+            override fun onCancel() {
+                viewModel.clearError()
+                Toast.makeText(context, fbCancelledMsg, Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onError(error: FacebookException) {
+                Toast.makeText(context, "$fbFailedMsg: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+        LoginManager.getInstance().registerCallback(callbackManager, callback)
+        onDispose {
+            LoginManager.getInstance().unregisterCallback(callbackManager)
+        }
+    }
 
     val isLargeScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
     val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
@@ -144,7 +210,9 @@ fun RegisterScreen(
                             value = password,
                             onValueChange = viewModel::onPasswordChange,
                             placeholder = "••••••••",
-                            isPassword = true
+                            isPassword = true,
+                            isPasswordVisible = passwordVisible,
+                            onVisibilityToggle = { passwordVisible = !passwordVisible }
                         )
                         Spacer(modifier = Modifier.height(if (isPhoneLandscape) 8.dp else 16.dp))
                         RegisterInputField(
@@ -152,8 +220,19 @@ fun RegisterScreen(
                             value = confirmPassword,
                             onValueChange = viewModel::onConfirmPasswordChange,
                             placeholder = "••••••••",
-                            isPassword = true
+                            isPassword = true,
+                            isPasswordVisible = confirmPasswordVisible,
+                            onVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible }
                         )
+
+                        errorResId?.let {
+                            Text(
+                                text = stringResource(it),
+                                color = Color.Red,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
 
                         errorMessage?.let {
                             Text(
@@ -167,7 +246,13 @@ fun RegisterScreen(
                         Spacer(modifier = Modifier.height(if (isPhoneLandscape) 12.dp else 24.dp))
 
                         Button(
-                            onClick = { viewModel.register { navController.navigate(Screen.Home.route) } },
+                            onClick = { 
+                                viewModel.register { 
+                                    navController.navigate(Screen.Home.route) {
+                                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                                    }
+                                } 
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
@@ -214,7 +299,36 @@ fun RegisterScreen(
                                 containerColor = Color.White,
                                 contentColor = Color.Black,
                                 modifier = Modifier.weight(1f),
-                                onClick = { viewModel.registerWithGoogle { navController.navigate(Screen.Home.route) } }
+                                onClick = { 
+                                    coroutineScope.launch {
+                                        val googleIdOption = GetGoogleIdOption.Builder()
+                                            .setFilterByAuthorizedAccounts(false)
+                                            .setServerClientId(webClientId)
+                                            .setAutoSelectEnabled(true)
+                                            .build()
+
+                                        val request = GetCredentialRequest.Builder()
+                                            .addCredentialOption(googleIdOption)
+                                            .build()
+
+                                        try {
+                                            val result = credentialManager.getCredential(
+                                                context = context,
+                                                request = request
+                                            )
+                                            val credential = result.credential
+                                            if (credential is GoogleIdTokenCredential) {
+                                                viewModel.signInWithGoogle(credential.idToken) {
+                                                    navController.navigate(Screen.Home.route) {
+                                                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                                                    }
+                                                }
+                                            }
+                                        } catch (e: GetCredentialException) {
+                                            Toast.makeText(context, "$googleFailedMsg: ${e.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
                             )
                             SocialAuthButton(
                                 text = stringResource(R.string.facebook),
@@ -222,7 +336,15 @@ fun RegisterScreen(
                                 containerColor = Color.White,
                                 contentColor = Color.Black,
                                 modifier = Modifier.weight(1f),
-                                onClick = { viewModel.registerWithFacebook { navController.navigate(Screen.Home.route) } }
+                                onClick = { 
+                                    LoginManager.getInstance().logOut()
+                                    LoginManager.getInstance().setLoginBehavior(LoginBehavior.WEB_ONLY)
+                                    LoginManager.getInstance().logInWithReadPermissions(
+                                        context as androidx.activity.ComponentActivity,
+                                        callbackManager,
+                                        listOf("email", "public_profile")
+                                    )
+                                }
                             )
                         }
 
@@ -230,7 +352,13 @@ fun RegisterScreen(
 
                         // Continue as Guest
                         OutlinedButton(
-                            onClick = { viewModel.continueAsGuest { navController.navigate(Screen.Home.route) } },
+                            onClick = { 
+                                viewModel.continueAsGuest { 
+                                    navController.navigate(Screen.Home.route) {
+                                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                                    }
+                                } 
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
@@ -290,7 +418,9 @@ fun RegisterInputField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    isPasswordVisible: Boolean = false,
+    onVisibilityToggle: (() -> Unit)? = null
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -307,7 +437,17 @@ fun RegisterInputField(
             placeholder = { Text(placeholder, color = Color.LightGray) },
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
-            visualTransformation = if (isPassword) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
+            visualTransformation = if (isPassword && !isPasswordVisible) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
+            trailingIcon = if (isPassword && onVisibilityToggle != null) {
+                {
+                    IconButton(onClick = onVisibilityToggle) {
+                        Icon(
+                            imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = null
+                        )
+                    }
+                }
+            } else null,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = EmeraldGreen,
                 unfocusedBorderColor = LightGrayBorder,
@@ -315,33 +455,5 @@ fun RegisterInputField(
                 unfocusedContainerColor = Color(0xFFFBFBFB)
             )
         )
-    }
-}
-
-@Composable
-fun SocialAuthButton(
-    text: String,
-    icon: Painter,
-    containerColor: Color,
-    contentColor: Color,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier.height(48.dp),
-        shape = RoundedCornerShape(24.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = containerColor),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
-        border = if (containerColor == Color.White) androidx.compose.foundation.BorderStroke(1.dp, LightGrayBorder) else null
-    ) {
-        Icon(
-            painter = icon,
-            contentDescription = null,
-            tint = Color.Unspecified,
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text, color = contentColor, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
 }

@@ -8,11 +8,13 @@ import java.time.LocalTime
 data class HabitEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val userId: String, // Owner ID
     val name: String,
     val description: String,
     val frequency: List<Int>, // e.g., List of days of the week (1-7)
     val dailyGoal: Int,
     val currentProgress: Int,
     val reminders: List<LocalTime>,
-    val lastUpdated: Long
+    val lastUpdated: Long,
+    val createdAt: String
 )
