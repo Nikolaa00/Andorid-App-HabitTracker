@@ -96,7 +96,6 @@ class AuthViewModel @Inject constructor(
                         
                         repository.upsertUser(anonymousUser)
                         
-                        // Initialize default settings
                         repository.upsertSettings(AppSettings(
                             userId = userId,
                             isDarkMode = false,
@@ -104,6 +103,7 @@ class AuthViewModel @Inject constructor(
                             preferredLanguage = "en"
                         ))
                         
+                        repository.claimGuestHabits(userId)
                         _authState.value = AuthState.Success
                         onSuccess()
                     } else {
@@ -136,7 +136,6 @@ class AuthViewModel @Inject constructor(
                     if (firebaseUser != null) {
                         val userId = firebaseUser.uid
                         
-                        // Sync with local DB using cloud display name
                         val user = User(
                             uid = userId,
                             displayName = firebaseUser.displayName ?: "User",
@@ -149,7 +148,6 @@ class AuthViewModel @Inject constructor(
                         
                         repository.upsertUser(user)
                         
-                        // Initialize default settings if not exists
                         repository.upsertSettings(AppSettings(
                             userId = userId,
                             isDarkMode = false,
@@ -157,6 +155,7 @@ class AuthViewModel @Inject constructor(
                             preferredLanguage = "en"
                         ))
                         
+                        repository.claimGuestHabits(userId)
                         _authState.value = AuthState.Success
                         onSuccess()
                     } else {
@@ -179,7 +178,6 @@ class AuthViewModel @Inject constructor(
                     if (firebaseUser != null) {
                         val userId = firebaseUser.uid
                         
-                        // Sync with local DB
                         val user = User(
                             uid = userId,
                             displayName = firebaseUser.displayName ?: "User",
@@ -192,7 +190,6 @@ class AuthViewModel @Inject constructor(
                         
                         repository.upsertUser(user)
                         
-                        // Initialize default settings if not exists
                         repository.upsertSettings(AppSettings(
                             userId = userId,
                             isDarkMode = false,
@@ -200,6 +197,7 @@ class AuthViewModel @Inject constructor(
                             preferredLanguage = "en"
                         ))
                         
+                        repository.claimGuestHabits(userId)
                         _authState.value = AuthState.Success
                         onSuccess()
                     } else {
@@ -241,6 +239,7 @@ class AuthViewModel @Inject constructor(
                             preferredLanguage = "en"
                         ))
                         
+                        repository.claimGuestHabits(userId)
                         _authState.value = AuthState.Success
                         onSuccess()
                     } else {

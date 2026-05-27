@@ -4,9 +4,11 @@ import com.example.habittrackerapp.data.local.dao.HabitDao
 import com.example.habittrackerapp.data.local.dao.UserDao
 import com.example.habittrackerapp.data.mapper.toDomain
 import com.example.habittrackerapp.data.mapper.toEntity
+import com.example.habittrackerapp.di.ApplicationScope
 import com.example.habittrackerapp.domain.model.AppSettings
 import com.example.habittrackerapp.domain.model.Habit
 import com.example.habittrackerapp.domain.model.User
+import com.example.habittrackerapp.domain.repository.ISyncRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +21,9 @@ import javax.inject.Singleton
 class HabitRepository @Inject constructor(
     private val habitDao: HabitDao,
     private val userDao: UserDao,
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val syncRepository: ISyncRepository,
+    @ApplicationScope private val externalScope: CoroutineScope
 ) {
     // Habit Operations
     fun getHabitsForUser(userId: String): Flow<List<Habit>> = 
@@ -33,13 +37,46 @@ class HabitRepository @Inject constructor(
 
     suspend fun getHabitById(id: Int): Habit? = habitDao.getHabitById(id)?.toDomain()
 
-    suspend fun insertHabit(habit: Habit) = habitDao.insertHabit(habit.toEntity())
+    suspend fun insertHabit(habit: Habit) {
+        habitDao.insertHabit(habit.toEntity())
+        triggerBackgroundSync(habit.userId)
+    }
 
-    suspend fun updateHabit(habit: Habit) = habitDao.updateHabit(habit.toEntity())
+    suspend fun updateHabit(habit: Habit) {
+        habitDao.updateHabit(habit.toEntity())
+        triggerBackgroundSync(habit.userId)
+    }
 
-    suspend fun deleteHabit(habit: Habit) = habitDao.deleteHabit(habit.toEntity())
+    suspend fun deleteHabit(habit: Habit) {
+        habitDao.deleteHabit(habit.toEntity())
+        triggerBackgroundSync(habit.userId)
+    }
 
-    suspend fun deleteAllHabits() = habitDao.deleteAllHabits()
+    suspend fun deleteAllHabits() {
+        val currentUserId = firebaseAuth.currentUser?.uid
+        habitDao.deleteAllHabits()
+        currentUserId?.let { triggerBackgroundSync(it) }
+    }
+
+    /**
+     * Assigns any habits that don't belong to the current user (e.g. guest habits)
+     * to the logged-in user.
+     */
+    suspend fun claimGuestHabits(newUserId: String) {
+        val allLocalHabits = habitDao.getAllHabits().first()
+        allLocalHabits.forEach { entity ->
+            if (entity.userId != newUserId) {
+                habitDao.updateHabit(entity.copy(userId = newUserId, lastUpdated = System.currentTimeMillis()))
+            }
+        }
+        triggerBackgroundSync(newUserId)
+    }
+
+    private fun triggerBackgroundSync(userId: String) {
+        externalScope.launch {
+            syncRepository.pushLocalDataToFirestore(userId)
+        }
+    }
 
     // User & Session Operations
     private val _userSession = MutableStateFlow<User?>(null)

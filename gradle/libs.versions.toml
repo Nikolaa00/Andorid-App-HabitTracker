@@ -48,6 +48,7 @@ androidx-compose-material3-windowSizeClass = { group = "androidx.compose.materia
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 facebook-sdk = { group = "com.facebook.android", name = "facebook-android-sdk", version.ref = "facebookSdk" }
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
