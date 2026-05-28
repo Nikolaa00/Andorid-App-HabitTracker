@@ -38,12 +38,12 @@ class HabitRepository @Inject constructor(
     suspend fun getHabitById(id: Int): Habit? = habitDao.getHabitById(id)?.toDomain()
 
     suspend fun insertHabit(habit: Habit) {
-        habitDao.insertHabit(habit.toEntity())
+        habitDao.insertHabit(habit.toEntity().copy(isSynced = false))
         triggerBackgroundSync(habit.userId)
     }
 
     suspend fun updateHabit(habit: Habit) {
-        habitDao.updateHabit(habit.toEntity())
+        habitDao.updateHabit(habit.toEntity().copy(isSynced = false))
         triggerBackgroundSync(habit.userId)
     }
 
@@ -58,15 +58,11 @@ class HabitRepository @Inject constructor(
         currentUserId?.let { triggerBackgroundSync(it) }
     }
 
-    /**
-     * Assigns any habits that don't belong to the current user (e.g. guest habits)
-     * to the logged-in user.
-     */
     suspend fun claimGuestHabits(newUserId: String) {
         val allLocalHabits = habitDao.getAllHabits().first()
         allLocalHabits.forEach { entity ->
             if (entity.userId != newUserId) {
-                habitDao.updateHabit(entity.copy(userId = newUserId, lastUpdated = System.currentTimeMillis()))
+                habitDao.updateHabit(entity.copy(userId = newUserId, lastUpdated = System.currentTimeMillis(), isSynced = false))
             }
         }
         triggerBackgroundSync(newUserId)

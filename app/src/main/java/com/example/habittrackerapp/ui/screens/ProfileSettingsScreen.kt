@@ -145,20 +145,3 @@ fun ProfileSettingsScreen(
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
-
-@Composable
-fun StatCard(label: String, value: String, modifier: Modifier, accentColor: Color) {
-    Surface(
-        modifier = modifier.border(1.dp, LightGrayBorder, RoundedCornerShape(32.dp)),
-        shape = RoundedCornerShape(32.dp),
-        color = Color(0xFFF1F5F9).copy(alpha = 0.5f)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = label, fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-            Text(text = value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = accentColor)
-        }
-    }
-}

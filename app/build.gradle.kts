@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.runtime.livedata)
 
     // Core Android библиотеки
     implementation(libs.androidx.core.ktx) // Старите внатрешни зависности на оваа линија сега се форсирано поправени погоре!
@@ -84,6 +85,9 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     // Navigation Compose
     implementation(libs.androidx.navigation.compose)

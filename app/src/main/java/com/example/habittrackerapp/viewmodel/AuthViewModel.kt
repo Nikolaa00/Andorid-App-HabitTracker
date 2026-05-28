@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.habittrackerapp.R
 import com.example.habittrackerapp.data.repository.AuthRepository
 import com.example.habittrackerapp.data.repository.HabitRepository
+import com.example.habittrackerapp.data.worker.SyncManager
 import com.example.habittrackerapp.domain.model.AppSettings
 import com.example.habittrackerapp.domain.model.User
+import com.example.habittrackerapp.domain.repository.ISyncRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,7 +24,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val repository: HabitRepository
+    private val repository: HabitRepository,
+    private val syncRepository: ISyncRepository,
+    private val syncManager: SyncManager
 ) : ViewModel() {
 
     val currentUser = repository.userSession
@@ -104,6 +108,7 @@ class AuthViewModel @Inject constructor(
                         ))
                         
                         repository.claimGuestHabits(userId)
+                        syncManager.startPeriodicSync()
                         _authState.value = AuthState.Success
                         onSuccess()
                     } else {
@@ -156,6 +161,7 @@ class AuthViewModel @Inject constructor(
                         ))
                         
                         repository.claimGuestHabits(userId)
+                        syncManager.startPeriodicSync()
                         _authState.value = AuthState.Success
                         onSuccess()
                     } else {
@@ -198,6 +204,7 @@ class AuthViewModel @Inject constructor(
                         ))
                         
                         repository.claimGuestHabits(userId)
+                        syncManager.startPeriodicSync()
                         _authState.value = AuthState.Success
                         onSuccess()
                     } else {
@@ -240,6 +247,7 @@ class AuthViewModel @Inject constructor(
                         ))
                         
                         repository.claimGuestHabits(userId)
+                        syncManager.startPeriodicSync()
                         _authState.value = AuthState.Success
                         onSuccess()
                     } else {

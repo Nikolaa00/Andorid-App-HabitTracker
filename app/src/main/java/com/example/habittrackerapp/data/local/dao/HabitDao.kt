@@ -24,6 +24,12 @@ interface HabitDao {
     @Delete
     suspend fun deleteHabit(habit: HabitEntity)
 
+    @Query("SELECT * FROM habits WHERE userId = :userId AND isSynced = 0")
+    suspend fun getUnsyncedHabits(userId: String): List<HabitEntity>
+
+    @Query("UPDATE habits SET isSynced = 1 WHERE id IN (:habitIds)")
+    suspend fun markHabitsAsSynced(habitIds: List<Int>)
+
     @Query("DELETE FROM habits")
     suspend fun deleteAllHabits()
 }
