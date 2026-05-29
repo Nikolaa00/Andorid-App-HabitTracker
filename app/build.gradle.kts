@@ -25,7 +25,7 @@ android {
     defaultConfig {
         applicationId = "com.example.habittrackerapp"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 

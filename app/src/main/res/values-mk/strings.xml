@@ -32,7 +32,10 @@
     <string name="error_empty_fields">Ве молиме пополнете ги сите полиња</string>
     <string name="error_auth_failed">Неуспешна автентикација: %1$s</string>
     <string name="error_google_signin_cancelled">Google најавата беше откажана.</string>
-    <string name="error_google_signin_failed">Google најавата не успеа.</string>
+    <string name="error_google_signin_failed">Google најавата не успеа: %1$s</string>
+    <string name="error_no_accounts_found">Не се пронајдени сметки. Ве молиме додајте Google сметка во поставките.</string>
+    <string name="error_unexpected">Се случи неочекувана грешка: %1$s</string>
+    <string name="error_auth_failed_general">Неуспешна автентикација</string>
     <string name="facebook_app_id">960668496887576</string>
     <string name="fb_login_protocol_scheme">fb960668496887576</string>
     <string name="facebook_client_token">a1f75f51e39ffe9b6625f1edd8deaf61</string>

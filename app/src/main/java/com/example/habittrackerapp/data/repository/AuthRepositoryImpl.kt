@@ -2,13 +2,13 @@ package com.example.habittrackerapp.data.repository
 
 import android.content.Context
 import com.facebook.login.LoginManager
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -86,12 +86,11 @@ class AuthRepositoryImpl @Inject constructor(
             // Sign out from Firebase
             firebaseAuth.signOut()
             
-            // Sign out from Google to clear account selection cache
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
-            val googleSignInClient = GoogleSignIn.getClient(context, gso)
-            googleSignInClient.signOut().await()
+            // Clear Credential Manager state (Google / Passkeys)
+            val credentialManager = CredentialManager.create(context)
+            credentialManager.clearCredentialState(ClearCredentialStateRequest())
 
-            // Sign out from Facebook to clear the session and force account picker
+            // Sign out from Facebook
             LoginManager.getInstance().logOut()
         } catch (e: Exception) {
             // Log or handle error if necessary

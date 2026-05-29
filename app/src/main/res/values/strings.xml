@@ -33,7 +33,10 @@
     <string name="error_auth_failed">Authentication failed: %1$s</string>
     <string name="default_web_client_id">744297408708-tf57bm2kkkrh47s23qr3u3evd7oramnh.apps.googleusercontent.com</string>
     <string name="error_google_signin_cancelled">Google Sign-In was cancelled.</string>
-    <string name="error_google_signin_failed">Google Sign-In failed.</string>
+    <string name="error_google_signin_failed">Google Sign-In failed: %1$s</string>
+    <string name="error_no_accounts_found">No accounts found. Please add a Google account in Settings.</string>
+    <string name="error_unexpected">An unexpected error occurred: %1$s</string>
+    <string name="error_auth_failed_general">Authentication failed</string>
     <string name="facebook_app_id">960668496887576</string>
     <string name="fb_login_protocol_scheme">fb960668496887576</string>
     <string name="facebook_client_token">a1f75f51e39ffe9b6625f1edd8deaf61</string>
