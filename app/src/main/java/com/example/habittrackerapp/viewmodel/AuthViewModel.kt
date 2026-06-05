@@ -11,10 +11,13 @@ import com.example.habittrackerapp.domain.model.AppSettings
 import com.example.habittrackerapp.domain.model.User
 import com.example.habittrackerapp.domain.repository.ISyncRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -35,6 +38,24 @@ class AuthViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null
         )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val appSettings = currentUser.flatMapLatest { user ->
+        if (user != null) repository.getSettings(user.uid)
+        else flowOf(null)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    fun updateNotificationPreference(enabled: Boolean) {
+        viewModelScope.launch {
+            val user = currentUser.value ?: return@launch
+            val currentSettings = appSettings.value ?: AppSettings(user.uid, false, false, "en")
+            repository.upsertSettings(currentSettings.copy(notificationsEnabled = enabled))
+        }
+    }
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()

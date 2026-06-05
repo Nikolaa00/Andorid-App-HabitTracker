@@ -15,8 +15,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,7 +31,9 @@ class SyncRepositoryImpl @Inject constructor(
     @ApplicationScope private val externalScope: CoroutineScope
 ) : ISyncRepository {
 
-    override suspend fun pushLocalDataToFirestore(userId: String): Result<Unit> = internalPush(userId)
+    override suspend fun pushLocalDataToFirestore(userId: String): Result<Unit> = withContext(Dispatchers.IO) {
+        internalPush(userId)
+    }
 
     private suspend fun internalPush(userId: String): Result<Unit> = runCatching {
         Log.d("SyncDebug", "pushLocalDataToFirestore started for $userId")
@@ -93,8 +97,9 @@ class SyncRepositoryImpl @Inject constructor(
         Log.e("SyncDebug", "pushLocalDataToFirestore failed", it)
     }
 
-    override suspend fun pullFirestoreDataToLocal(userId: String): Result<Unit> = runCatching {
-        Log.d("SyncDebug", "pullFirestoreDataToLocal started for $userId")
+    override suspend fun pullFirestoreDataToLocal(userId: String): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            Log.d("SyncDebug", "pullFirestoreDataToLocal started for $userId")
         val userDoc = firestore.collection(FirestoreConstants.USERS_COLLECTION).document(userId).get().await()
         val settingsDoc = firestore.collection(FirestoreConstants.USERS_COLLECTION)
             .document(userId)
@@ -125,6 +130,7 @@ class SyncRepositoryImpl @Inject constructor(
         if (it is CancellationException) throw it
         Log.e("SyncDebug", "pullFirestoreDataToLocal failed", it)
     }
+}
 
     override suspend fun fullSync(userId: String): Result<Unit> {
         externalScope.launch {

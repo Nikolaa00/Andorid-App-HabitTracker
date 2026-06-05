@@ -35,7 +35,8 @@ fun ProfileSettingsScreen(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val currentUser by viewModel.currentUser.collectAsState()
-    var notificationsEnabled by remember { mutableStateOf(true) }
+    val appSettings by viewModel.appSettings.collectAsState()
+
     val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
     val spacing = if (isPhoneLandscape) 8.dp else 16.dp
 
@@ -98,8 +99,8 @@ fun ProfileSettingsScreen(
                 ) {
                     Text(text = stringResource(R.string.label_notifications), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.Gray)
                     Switch(
-                        checked = notificationsEnabled,
-                        onCheckedChange = { notificationsEnabled = it },
+                        checked = appSettings?.notificationsEnabled ?: false,
+                        onCheckedChange = { viewModel.updateNotificationPreference(it) },
                         colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = EmeraldGreen)
                     )
                 }

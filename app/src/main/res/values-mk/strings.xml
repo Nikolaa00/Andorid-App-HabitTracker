@@ -97,4 +97,9 @@
     <string name="label_am">AM</string>
     <string name="label_pm">PM</string>
     <string name="no_reminders">Нема поставени потсетници</string>
+
+    <string name="channel_name">Потсетници за навики</string>
+    <string name="channel_description">Известувања за закажани потсетници за навики</string>
+    <string name="notification_title">Потсетник за навика</string>
+    <string name="notification_message">Време е да работите на вашата навика: %1$s!</string>
 </resources>
