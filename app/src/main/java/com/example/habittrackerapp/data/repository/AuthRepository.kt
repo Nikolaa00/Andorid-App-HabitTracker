@@ -11,4 +11,5 @@ interface AuthRepository {
     suspend fun updateDisplayName(name: String): Result<Unit>
     suspend fun logout()
     fun isUserLoggedIn(): Boolean
+    suspend fun syncFCMToken()
 }

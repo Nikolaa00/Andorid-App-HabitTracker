@@ -26,6 +26,7 @@ class HabitRepository @Inject constructor(
     private val habitDao: HabitDao,
     private val userDao: UserDao,
     private val firebaseAuth: FirebaseAuth,
+    private val authRepository: AuthRepository,
     private val syncRepository: ISyncRepository,
     private val syncManager: SyncManager,
     private val reminderScheduler: ReminderScheduler,
@@ -131,6 +132,7 @@ class HabitRepository @Inject constructor(
             val currentUid = firebaseAuth.currentUser?.uid
             if (currentUid != null) {
                 analytics.setUserId(currentUid) // Set Analytics User ID
+                authRepository.syncFCMToken()   // Sync FCM Token on app start
                 val user = userDao.getUserByIdSuspend(currentUid)
                 _userSession.value = user?.toDomain()
             } else {

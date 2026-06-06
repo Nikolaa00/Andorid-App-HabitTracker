@@ -13,6 +13,7 @@ import com.example.habittrackerapp.data.remote.FirestoreConstants
 import com.example.habittrackerapp.util.NotificationConstants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,7 +49,7 @@ class FCMService : FirebaseMessagingService() {
                 val data = mapOf("fcmToken" to token)
                 firestore.collection(FirestoreConstants.USERS_COLLECTION)
                     .document(userId)
-                    .set(data, com.google.firebase.firestore.SetOptions.merge())
+                    .set(data, SetOptions.merge())
             }
     }
 

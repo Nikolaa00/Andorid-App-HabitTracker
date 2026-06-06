@@ -2,6 +2,8 @@ package com.example.habittrackerapp.di
 
 import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.example.habittrackerapp.data.repository.AuthRepository
 import com.example.habittrackerapp.data.repository.AuthRepositoryImpl
 import dagger.Module
@@ -23,8 +25,10 @@ object AuthModule {
     @Singleton
     fun provideAuthRepository(
         auth: FirebaseAuth,
+        firestore: FirebaseFirestore,
+        messaging: FirebaseMessaging,
         @ApplicationContext context: Context
     ): AuthRepository {
-        return AuthRepositoryImpl(auth, context)
+        return AuthRepositoryImpl(auth, firestore, messaging, context)
     }
 }
