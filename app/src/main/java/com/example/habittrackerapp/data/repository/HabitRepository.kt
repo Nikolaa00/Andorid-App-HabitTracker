@@ -10,6 +10,7 @@ import com.example.habittrackerapp.domain.model.AppSettings
 import com.example.habittrackerapp.domain.model.Habit
 import com.example.habittrackerapp.domain.model.User
 import com.example.habittrackerapp.domain.repository.ISyncRepository
+import com.example.habittrackerapp.data.worker.SyncManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import android.os.Bundle
@@ -26,6 +27,7 @@ class HabitRepository @Inject constructor(
     private val userDao: UserDao,
     private val firebaseAuth: FirebaseAuth,
     private val syncRepository: ISyncRepository,
+    private val syncManager: SyncManager,
     private val reminderScheduler: ReminderScheduler,
     private val analytics: FirebaseAnalytics,
     @ApplicationScope private val externalScope: CoroutineScope
@@ -103,8 +105,16 @@ class HabitRepository @Inject constructor(
         triggerBackgroundSync(newUserId)
     }
 
+    private var syncJob: kotlinx.coroutines.Job? = null
     private fun triggerBackgroundSync(userId: String) {
-        externalScope.launch {
+        // 1. Schedule WorkManager for reliable background synchronization
+        syncManager.triggerOneTimeSync()
+
+        // 2. Immediate direct sync with debounce to satisfy "instant" requirement
+        // without flooding the network during bulk operations.
+        syncJob?.cancel()
+        syncJob = externalScope.launch {
+            kotlinx.coroutines.delay(1000)
             syncRepository.pushLocalDataToFirestore(userId)
         }
     }
@@ -120,6 +130,7 @@ class HabitRepository @Inject constructor(
         CoroutineScope(Dispatchers.IO).launch {
             val currentUid = firebaseAuth.currentUser?.uid
             if (currentUid != null) {
+                analytics.setUserId(currentUid) // Set Analytics User ID
                 val user = userDao.getUserByIdSuspend(currentUid)
                 _userSession.value = user?.toDomain()
             } else {

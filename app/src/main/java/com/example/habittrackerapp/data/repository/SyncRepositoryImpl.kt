@@ -41,36 +41,15 @@ class SyncRepositoryImpl @Inject constructor(
         val habits = habitDao.getHabitsByUserId(userId).first()
         val settings = userDao.getSettingsByUserId(userId).first()
 
-        // 1. Fetch current habits in Firestore to identify deletions
-        val remoteHabitsSnapshot = firestore.collection(FirestoreConstants.USERS_COLLECTION)
-            .document(userId)
-            .collection(FirestoreConstants.HABITS_COLLECTION)
-            .get().await()
-        
-        val remoteHabitIds = remoteHabitsSnapshot.documents.map { it.id }
-        val localHabitIds = habits.map { it.id.toString() }
-
         val batch = firestore.batch()
 
-        // 2. Delete remote habits that no longer exist locally
-        remoteHabitIds.forEach { id ->
-            if (id !in localHabitIds) {
-                val habitRef = firestore.collection(FirestoreConstants.USERS_COLLECTION)
-                    .document(userId)
-                    .collection(FirestoreConstants.HABITS_COLLECTION)
-                    .document(id)
-                batch.delete(habitRef)
-                Log.d("SyncDebug", "Deleting orphaned habit $id from Firestore")
-            }
-        }
-
-        // 3. Sync User Profile
+        // 1. Sync User Profile
         user?.let {
             val userRef = firestore.collection(FirestoreConstants.USERS_COLLECTION).document(userId)
             batch.set(userRef, it.toFirestoreDto(), SetOptions.merge())
         }
 
-        // 4. Sync Settings
+        // 2. Sync Settings
         settings?.let {
             val settingsRef = firestore.collection(FirestoreConstants.USERS_COLLECTION)
                 .document(userId)
@@ -79,7 +58,7 @@ class SyncRepositoryImpl @Inject constructor(
             batch.set(settingsRef, it.toFirestoreDto(), SetOptions.merge())
         }
 
-        // 5. Upsert Habits
+        // 3. Upsert Habits
         Log.d("SyncDebug", "Pushing ${habits.size} habits to Firestore")
         habits.forEach { habit ->
             val habitRef = firestore.collection(FirestoreConstants.USERS_COLLECTION)
@@ -91,7 +70,9 @@ class SyncRepositoryImpl @Inject constructor(
 
         batch.commit().await()
         Log.d("SyncDebug", "pushLocalDataToFirestore success")
-        Unit
+
+        // Update local sync status
+        habitDao.markHabitsAsSynced(habits.map { it.id })
     }.onFailure {
         if (it is CancellationException) throw it
         Log.e("SyncDebug", "pushLocalDataToFirestore failed", it)

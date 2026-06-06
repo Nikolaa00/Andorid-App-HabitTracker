@@ -14,6 +14,7 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.messaging.FirebaseMessaging
 import com.example.habittrackerapp.data.repository.HabitRepository
 import com.example.habittrackerapp.navigation.Screen
 import com.example.habittrackerapp.ui.MainNavigationShell
@@ -48,6 +49,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         askNotificationPermission()
+
+        // Fetch and log FCM Token for testing campaigns
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                android.util.Log.w("FCM_TEST", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            val token = task.result
+            android.util.Log.d("FCM_TOKEN", "Your current FCM Token: $token")
+        }
+
         setContent {
             HabitTrackerAppTheme {
                 val isLoaded by repository.isSessionLoaded.collectAsStateWithLifecycle()
