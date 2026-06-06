@@ -70,6 +70,7 @@ dependencies {
 
     // Core Android библиотеки
     implementation(libs.androidx.core.ktx) // Старите внатрешни зависности на оваа линија сега се форсирано поправени погоре!
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
