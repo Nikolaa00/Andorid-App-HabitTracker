@@ -58,18 +58,18 @@ class FCMService : FirebaseMessagingService() {
         Log.d("FCMService", "Message received from: ${message.from}")
 
         message.notification?.let {
-            showNotification(it.title ?: getString(R.string.app_name), it.body ?: "")
+            showNotification(it.title ?: getString(R.string.app_name), it.body ?: "", message)
         } ?: run {
             // Handle data payload
             val title = message.data["title"] ?: getString(R.string.app_name)
             val body = message.data["body"] ?: ""
             if (body.isNotEmpty()) {
-                showNotification(title, body)
+                showNotification(title, body, message)
             }
         }
     }
 
-    private fun showNotification(title: String, message: String) {
+    private fun showNotification(title: String, message: String, remoteMessage: RemoteMessage? = null) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         
         val channel = NotificationChannel(
@@ -83,6 +83,10 @@ class FCMService : FirebaseMessagingService() {
 
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            // Додавање на податоците од пораката во Intent-от за Firebase Analytics да го регистрира кликот
+            remoteMessage?.data?.forEach { (key, value) ->
+                putExtra(key, value)
+            }
         }
         
         val pendingIntent = PendingIntent.getActivity(
