@@ -36,11 +36,11 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialException
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import java.util.UUID
+import android.util.Log
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.habittrackerapp.R
@@ -64,18 +64,45 @@ fun SignInScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val credentialManager = remember { CredentialManager.create(context) }
+    
+    val webClientId = stringResource(R.string.default_web_client_id)
+    val googleSignInOptions = remember(webClientId) {
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(webClientId)
+            .requestEmail()
+            .build()
+    }
+    val googleSignInClient = remember { GoogleSignIn.getClient(context, googleSignInOptions) }
+
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                val idToken = account?.idToken
+                if (idToken != null) {
+                    viewModel.signInWithGoogle(idToken) {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Welcome.route) { inclusive = true }
+                        }
+                    }
+                }
+            } catch (e: ApiException) {
+                Log.e("Auth", "Google Sign-In failed: ${e.statusCode}", e)
+                Toast.makeText(context, "Google Sign-In failed: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
     
     // Define localized strings at the top to avoid LocalContext.current lint warnings
     val fbCancelledMsg = stringResource(R.string.error_facebook_signin_cancelled)
     val fbFailedMsg = stringResource(R.string.error_facebook_signin_failed)
-    val googleFailedMsg = stringResource(R.string.error_google_signin_failed)
-    val webClientId = stringResource(R.string.default_web_client_id)
-    val authFailedMsg = "Authentication failed" 
 
     val emptyFieldsMsg = stringResource(R.string.error_empty_fields)
     val invalidEmailMsg = stringResource(R.string.error_invalid_email)
+
+    val authFailedGeneralMsg = stringResource(R.string.error_auth_failed_general)
 
     val callbackManager = remember { CallbackManager.Factory.create() }
     
@@ -125,7 +152,7 @@ fun SignInScreen(
                 error.messageResId == R.string.error_empty_fields -> emptyFieldsMsg
                 error.messageResId == R.string.error_invalid_email -> invalidEmailMsg
                 error.message != null -> error.message
-                else -> authFailedMsg
+                else -> authFailedGeneralMsg
             }
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             viewModel.clearError()
@@ -328,33 +355,8 @@ fun SignInScreen(
                                 contentColor = Color.Black,
                                 modifier = Modifier.weight(1f),
                                 onClick = {
-                                    coroutineScope.launch {
-                                        val googleIdOption = GetGoogleIdOption.Builder()
-                                            .setFilterByAuthorizedAccounts(false)
-                                            .setServerClientId(webClientId)
-                                            .setAutoSelectEnabled(true)
-                                            .build()
-
-                                        val request = GetCredentialRequest.Builder()
-                                            .addCredentialOption(googleIdOption)
-                                            .build()
-
-                                        try {
-                                            val result = credentialManager.getCredential(
-                                                context = context,
-                                                request = request
-                                            )
-                                            val credential = result.credential
-                                            if (credential is GoogleIdTokenCredential) {
-                                                viewModel.signInWithGoogle(credential.idToken) {
-                                                    navController.navigate(Screen.Home.route) {
-                                                        popUpTo(Screen.Welcome.route) { inclusive = true }
-                                                    }
-                                                }
-                                            }
-                                        } catch (e: GetCredentialException) {
-                                            Toast.makeText(context, "$googleFailedMsg: ${e.message}", Toast.LENGTH_SHORT).show()
-                                        }
+                                    googleSignInClient.signOut().addOnCompleteListener {
+                                        googleSignInLauncher.launch(googleSignInClient.signInIntent)
                                     }
                                 }
                             )

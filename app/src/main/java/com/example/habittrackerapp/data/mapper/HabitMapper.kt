@@ -14,7 +14,8 @@ fun HabitEntity.toDomain(): Habit {
         currentProgress = currentProgress,
         reminders = reminders,
         lastUpdated = lastUpdated,
-        createdAt = createdAt
+        createdAt = createdAt,
+        isSynced = isSynced
     )
 }
 
@@ -29,6 +30,7 @@ fun Habit.toEntity(): HabitEntity {
         currentProgress = currentProgress,
         reminders = reminders,
         lastUpdated = lastUpdated,
-        createdAt = createdAt
+        createdAt = createdAt,
+        isSynced = isSynced
     )
 }

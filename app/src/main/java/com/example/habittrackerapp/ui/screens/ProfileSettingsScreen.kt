@@ -35,7 +35,8 @@ fun ProfileSettingsScreen(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val currentUser by viewModel.currentUser.collectAsState()
-    var notificationsEnabled by remember { mutableStateOf(true) }
+    val appSettings by viewModel.appSettings.collectAsState()
+
     val isPhoneLandscape = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
     val spacing = if (isPhoneLandscape) 8.dp else 16.dp
 
@@ -98,8 +99,8 @@ fun ProfileSettingsScreen(
                 ) {
                     Text(text = stringResource(R.string.label_notifications), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.Gray)
                     Switch(
-                        checked = notificationsEnabled,
-                        onCheckedChange = { notificationsEnabled = it },
+                        checked = appSettings?.notificationsEnabled ?: false,
+                        onCheckedChange = { viewModel.updateNotificationPreference(it) },
                         colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = EmeraldGreen)
                     )
                 }
@@ -143,22 +144,5 @@ fun ProfileSettingsScreen(
         }
         
         Spacer(modifier = Modifier.height(16.dp))
-    }
-}
-
-@Composable
-fun StatCard(label: String, value: String, modifier: Modifier, accentColor: Color) {
-    Surface(
-        modifier = modifier.border(1.dp, LightGrayBorder, RoundedCornerShape(32.dp)),
-        shape = RoundedCornerShape(32.dp),
-        color = Color(0xFFF1F5F9).copy(alpha = 0.5f)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = label, fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-            Text(text = value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = accentColor)
-        }
     }
 }

@@ -12,5 +12,6 @@ data class Habit(
     val currentProgress: Int,
     val reminders: List<LocalTime>,
     val lastUpdated: Long,
-    val createdAt: String
+    val createdAt: String,
+    val isSynced: Boolean = false
 )

@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background: EmeraldGreen (#00C853)
+         Sized at 56dp (centered) to ensure the corners fit perfectly within the
+         system's circular mask without being clipped. -->
+    <path
+        android:fillColor="#00C853"
+        android:pathData="M37.2,26 L70.8,26 A11.2,11.2 0 0 1 82,37.2 L82,70.8 A11.2,11.2 0 0 1 70.8,82 L37.2,82 A11.2,11.2 0 0 1 26,70.8 L26,37.2 A11.2,11.2 0 0 1 37.2,26 Z" />
+
+    <!-- Icon: CheckCircle centered and sized at 50% of the green box (28dp) -->
+    <group
+        android:translateX="40"
+        android:translateY="40"
+        android:scaleX="1.1667"
+        android:scaleY="1.1667">
+        <path
+            android:fillColor="#000000"
+            android:pathData="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10,-4.48,10,-10S17.52,2,12,2zM10,17l-5,-5 1.41,-1.41L10,14.17l7.59,-7.59L19,8l-9,9z" />
+    </group>
+</vector>

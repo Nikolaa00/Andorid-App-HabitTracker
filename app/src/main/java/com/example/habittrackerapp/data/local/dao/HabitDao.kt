@@ -16,13 +16,19 @@ interface HabitDao {
     suspend fun getHabitById(id: Int): HabitEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHabit(habit: HabitEntity)
+    suspend fun insertHabit(habit: HabitEntity): Long
 
     @Update
     suspend fun updateHabit(habit: HabitEntity)
 
     @Delete
     suspend fun deleteHabit(habit: HabitEntity)
+
+    @Query("SELECT * FROM habits WHERE userId = :userId AND isSynced = 0")
+    suspend fun getUnsyncedHabits(userId: String): List<HabitEntity>
+
+    @Query("UPDATE habits SET isSynced = 1 WHERE id IN (:habitIds)")
+    suspend fun markHabitsAsSynced(habitIds: List<Int>)
 
     @Query("DELETE FROM habits")
     suspend fun deleteAllHabits()

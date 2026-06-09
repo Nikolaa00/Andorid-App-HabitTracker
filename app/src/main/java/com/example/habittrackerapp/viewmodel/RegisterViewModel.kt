@@ -77,6 +77,7 @@ class RegisterViewModel @Inject constructor(
             notificationsEnabled = true,
             preferredLanguage = "en"
         ))
+        repository.claimGuestHabits(userId)
     }
 
     fun register(onSuccess: () -> Unit) {
@@ -110,9 +111,7 @@ class RegisterViewModel @Inject constructor(
                 .onSuccess { authResult ->
                     val firebaseUser = authResult.user
                     if (firebaseUser != null) {
-                        // Update cloud profile with username
                         authRepository.updateDisplayName(_username.value)
-
                         initializeUser(firebaseUser.uid, _username.value, _email.value)
                         _isLoading.value = false
                         onSuccess()
@@ -154,14 +153,6 @@ class RegisterViewModel @Inject constructor(
                     _isLoading.value = false
                 }
         }
-    }
-
-    fun registerWithGoogle(onSuccess: () -> Unit) {
-        // Obsolete if we use the above
-    }
-
-    fun registerWithFacebook(onSuccess: () -> Unit) {
-        // Obsolete
     }
 
     fun signInWithFacebook(accessToken: String, onSuccess: () -> Unit) {

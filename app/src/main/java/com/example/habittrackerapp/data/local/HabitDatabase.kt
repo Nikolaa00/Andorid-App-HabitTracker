@@ -15,7 +15,7 @@ import com.example.habittrackerapp.data.local.entity.UserEntity
         UserEntity::class,
         AppSettingsEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
